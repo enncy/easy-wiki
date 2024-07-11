@@ -3,8 +3,8 @@ import chalk from 'chalk';
 import { resolve, join } from 'path';
 import { Config, plugins } from '.';
 import fs from 'fs';
-import { getMarkdownContext, parseMarkdownContext } from './utils';
-import { buildOne } from './build';
+import { getFileInfo, getMarkdownContext, parseMarkdownContext } from './utils';
+import { renderMarkdownTo } from './core/markdown';
 
 export function watch(cfg: Config) {
 	console.log(chalk.blueBright('\n\n[easy-wiki]:'), 'watcher running!');
@@ -14,13 +14,18 @@ export function watch(cfg: Config) {
 	}
 	chokidar.watch(join(cfg.sources_folder, '**/*.md'), { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
 		if (stats?.isFile) {
-			const ctx = getMarkdownContext(fs.readFileSync(path).toString('utf-8'));
+			const file_content = fs.readFileSync(path).toString('utf-8');
+			const ctx = getMarkdownContext(file_content);
+			const info = getFileInfo(resolve(path), cfg, ctx, file_content);
 			for (const plugin of plugins) {
 				plugin.onMarkdownChange(resolve(path), ctx);
 			}
-			fs.writeFileSync(path, parseMarkdownContext(ctx));
-			const dest = buildOne(cfg, path);
-			console.log('[easy-wiki watcher] build-finish: ' + path + ' -> ' + dest);
+			info.file_content = parseMarkdownContext(ctx);
+			fs.writeFileSync(path, info.file_content);
+
+			renderMarkdownTo(info);
+
+			console.log('[easy-wiki watcher] build-finish: ' + path + ' -> ' + info.dest);
 		}
 	});
 }

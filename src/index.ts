@@ -7,8 +7,11 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import { Plugin } from './interface';
 import { join, resolve } from 'path';
+import TimeWriterPlugin from './plugins/time_writer';
+import InfoWriterPlugin from './plugins/info_writer';
 
-export const plugins: Plugin[] = [];
+export const plugins: Plugin[] = [new TimeWriterPlugin(), new InfoWriterPlugin()];
+export let config: Config = undefined as unknown as Config;
 
 export interface Config {
 	sources_folder: string;
@@ -16,6 +19,9 @@ export interface Config {
 	output_folder: string;
 	ignore_sources: string[];
 	ignore_plugins: string[];
+	styles: string[];
+	html_template: string;
+	markdown_it_config: Record<string, any>;
 }
 
 const program = new Command();
@@ -32,14 +38,24 @@ program.command('init').action(() => {
 				{
 					sources_folder: './sources',
 					plugins_folder: './plugins',
-					output_folder: './',
+					scripts_folder: './scripts',
+					output_folder: './dist',
 					ignore_sources: ['./sources/**/*.ignore.md'],
-					ignore_plugins: ['./plugins/**/*.ignore.js']
+					ignore_plugins: ['./plugins/**/*.ignore.js'],
+					html_template: './template.html',
+					styles: ['./style.css'],
+					markdown_it_config: {}
 				} as Config,
 				null,
 				4
 			)
 		);
+		// 将当前的默认样式文件和模版文件导入
+
+		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), './template.html');
+		console.log(chalk.greenBright('template.html generated!'));
+		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), './style.css');
+		console.log(chalk.greenBright('style.css generated!'));
 	}
 
 	console.log(chalk.greenBright('plugins folder generated!'));
@@ -52,9 +68,9 @@ program
 	.version('1.0.0')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
-		const config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(config);
-		buildAll(config);
+		config = JSON.parse(fs.readFileSync(args.config).toString());
+		loadPlugins(config!);
+		buildAll(config!);
 	});
 
 program
@@ -62,9 +78,9 @@ program
 	.version('1.0.0')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
-		const config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(config);
-		watch(config);
+		config = JSON.parse(fs.readFileSync(args.config).toString());
+		loadPlugins(config!);
+		watch(config!);
 	});
 
 program.parse(process.argv);

@@ -34,7 +34,8 @@
 		"jsdom": "^24.1.0",
 		"markdown-it": "^14.1.0",
 		"markdown-it-anchor": "^9.0.1",
-		"markdown-it-container": "^4.0.0"
+		"markdown-it-container": "^4.0.0",
+		"node-fetch": "^2.6.7"
 	},
 	"devDependencies": {
 		"@types/jsdom": "^21.1.7",

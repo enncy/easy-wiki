@@ -1,5 +1,6 @@
 import { DOMWindow } from 'jsdom';
 import type MarkdownIt from 'markdown-it';
+import { getFileInfo } from './utils';
 
 export interface MarkdownContext {
 	content: string;
@@ -12,3 +13,5 @@ export interface Plugin {
 	onMarkdownChange(filepath: string, ctx: MarkdownContext): void;
 	onHtmlFileRender(filepath: string, ctx: MarkdownContext, window: DOMWindow): void;
 }
+
+export type FileInfo = ReturnType<typeof getFileInfo>;

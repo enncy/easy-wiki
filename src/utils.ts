@@ -1,4 +1,7 @@
+import { basename, dirname, join, resolve } from 'path';
 import { MarkdownContext } from './interface';
+import fs from 'fs';
+import { Config } from '.';
 
 export function getMarkdownContext(content: string) {
 	const [_, info, _content] = content.match(/------ewiki-config------([\s\S]+)------ewiki-config------([\s\S]+)/) || [];
@@ -24,4 +27,21 @@ export function parseMarkdownContext(ctx: MarkdownContext) {
 		'------ewiki-config------',
 		ctx.content
 	].join('\n');
+}
+
+export function getFileInfo(filepath: string, cfg: Config, ctx: MarkdownContext, file_content?: string) {
+	const stat = fs.statSync(filepath);
+	const dir = dirname(filepath).replace(resolve('./'), '').replace(/\\/g, '/');
+	const filename = basename(filepath);
+	const content = file_content ?? fs.readFileSync(filepath).toString('utf-8');
+	return {
+		dirname: dir,
+		filename: filename,
+		filepath: filepath,
+		dest: resolve(join(cfg.output_folder, join(dir, '../', filename.slice(0, -3) + '.html'))),
+		create_at: stat.birthtime.getTime(),
+		update_at: stat.mtime.getTime(),
+		file_content: content,
+		markdown_context: ctx
+	};
 }
