@@ -1,0 +1,19 @@
+{
+    "sources_folder": "./sources",
+    "plugins_folder": "./plugins",
+    "scripts_folder": "./scripts",
+    "output_folder": "./dist",
+    "ignore_sources": [
+        "./sources/**/*.ignore.md"
+    ],
+    "ignore_plugins": [
+        "./plugins/**/*.ignore.js"
+    ],
+    "html_template": "./template.html",
+    "styles": [
+        "./style.css"
+    ],
+    "readme": "./README.md",
+    "readme_mount": "body",
+    "markdown_it_config": {}
+}
