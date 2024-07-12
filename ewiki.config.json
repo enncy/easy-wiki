@@ -9,11 +9,11 @@
     "ignore_plugins": [
         "./plugins/**/*.ignore.js"
     ],
-    "html_template": "./template.html",
+    "html_template": "./node_modules/ewiki/plugins/readme-sidebar/readme.template.html",
     "styles": [
         "./style.css"
     ],
     "readme": "./README.md",
-    "readme_mount": "body",
+    "readme_mount": ".markdown-body",
     "markdown_it_config": {}
 }

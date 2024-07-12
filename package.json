@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "publish": "git add . && git commit -m 'publish' && git push origin"
+    "deploy": "npx ewiki && git add . && git commit -m 'publish' && git push origin"
   },
   "devDependencies": {
-    "ewiki": "^0.0.14"
+    "ewiki": "file:../easy-wiki"
   }
 }
