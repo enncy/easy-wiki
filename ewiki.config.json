@@ -1,6 +1,6 @@
 {
     "sources_folder": "./sources",
-    "plugins_folder": "./plugins",
+    "plugins_folder": "./node_modules/ewiki/plugins",
     "scripts_folder": "./scripts",
     "output_folder": "./dist",
     "ignore_sources": [
