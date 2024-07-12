@@ -120,6 +120,7 @@ function init() {
 	const style_path = resolve(process.cwd(), './style.css');
 	const readme_path = resolve(process.cwd(), './README.md');
 	const plugins_folder = resolve(process.cwd(), './plugins');
+	const type_path = resolve(process.cwd(), './env.d.ts');
 	if (fs.existsSync(template_path) === false) {
 		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), template_path);
@@ -134,6 +135,13 @@ function init() {
 		changes = true;
 		fs.writeFileSync(readme_path, '# Hello World');
 		console.log(chalk.greenBright('generated: [file] README.md'));
+	}
+
+	// 类型文件
+	if (fs.existsSync(type_path) === false) {
+		changes = true;
+		fs.copyFileSync(resolve(__dirname, '../lib/interface.d.ts'), type_path);
+		console.log(chalk.greenBright('generated: [file] env.d.ts'));
 	}
 
 	if (fs.existsSync(plugins_folder) === false) {
