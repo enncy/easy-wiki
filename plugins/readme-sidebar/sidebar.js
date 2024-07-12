@@ -32,7 +32,7 @@ exports.default = {
                 const a = document.createElement('a')
                 const name = info.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                 a.textContent = name
-                a.setAttribute('href', join(info.markdown_context.metadata.sidebar_base || '', info.dest.replace(process.cwd(), '')))
+                a.setAttribute('href', join(info.markdown_context.metadata.sidebar_base || '', info.dest.replace(process.cwd(), '')).replace(/\\/g, '/'))
                 sidebar.append(a)
 
                 // 生成各级别父元素
@@ -75,7 +75,8 @@ exports.default = {
                     if (source.markdown_context.metadata.sidebar != undefined) {
                         const name = source.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                         a.textContent = name
-                        a.setAttribute('href', join(info.markdown_context.metadata.sidebar_base || '', source.dest.replace(process.cwd(), '')))
+                        const href = join(info.markdown_context.metadata.sidebar_base || '', source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
+                        a.setAttribute('href', href)
                         if (folder) {
                             folder.appendChild(a)
                             folder.setAttribute('open', '')
