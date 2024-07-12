@@ -28,7 +28,61 @@ export interface Config {
 
 const program = new Command();
 
-program.command('init').action(() => {
+program.command('init').action(init);
+
+program
+	.command('build')
+	.option('--config <path>', 'config file path', './ewiki.config.json')
+	.action((args) => {
+		if (fs.existsSync(args.config) == false) {
+			console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
+			init();
+		}
+
+		config = JSON.parse(fs.readFileSync(args.config).toString());
+		console.log(config);
+
+		loadPlugins(config!).then(() => {
+			buildAll(config!);
+		});
+	});
+
+program
+	.command('watch')
+	.option('--config <path>', 'config file path', './ewiki.config.json')
+	.action((args) => {
+		if (fs.existsSync(args.config) == false) {
+			console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
+			init();
+		}
+		config = JSON.parse(fs.readFileSync(args.config).toString());
+		loadPlugins(config!).then(() => {
+			watch(config!);
+		});
+	});
+
+program.parse();
+
+async function loadPlugins(config: Config) {
+	// 加载插件
+	const files = await glob(join(config.plugins_folder, '**/*.js').replace(/\\/g, '/'), {
+		ignore: config.ignore_plugins
+	});
+
+	for (const file of files) {
+		console.log(chalk.blueBright('load plugin') + ' : ' + file);
+		const plu = require(resolve(file)).default;
+		if (typeof plu === 'function') {
+			plugins.push(new plu());
+		} else {
+			plugins.push(plu);
+		}
+	}
+
+	console.log('plugins load finish\n');
+}
+
+function init() {
 	if (fs.existsSync('./ewiki.config.json')) {
 		console.log(chalk.gray('ewiki.config.json exists'));
 	} else {
@@ -55,59 +109,24 @@ program.command('init').action(() => {
 			)
 		);
 		// 将当前的默认样式文件和模版文件导入
+		const template_path = resolve(__dirname, '../assets/template.html');
+		const style_path = resolve(__dirname, '../assets/style.css');
+		const readme_path = resolve('./README.md');
+		if (fs.existsSync(template_path) === false) {
+			fs.copyFileSync(template_path, './template.html');
+			console.log(chalk.greenBright('template.html generated!'));
+		}
+		if (fs.existsSync(style_path) === false) {
+			fs.copyFileSync(style_path, './style.css');
+			console.log(chalk.greenBright('style.css generated!'));
+		}
 
-		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), './template.html');
-		console.log(chalk.greenBright('template.html generated!'));
-		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), './style.css');
-		console.log(chalk.greenBright('style.css generated!'));
-		fs.writeFileSync('./README.md', '# Hello World');
-		console.log(chalk.greenBright('README.md generated!'));
+		if (fs.existsSync(readme_path) === false) {
+			fs.writeFileSync('./README.md', '# Hello World');
+			console.log(chalk.greenBright('README.md generated!'));
+		}
 	}
 
 	console.log(chalk.greenBright('plugins folder generated!'));
 	fs.mkdirSync('./plugins', { recursive: true });
-	// 创建默认占位符插件
-});
-
-program
-	.command('build')
-	.option('--config <path>', 'config file path', './ewiki.config.json')
-	.action((args) => {
-		config = JSON.parse(fs.readFileSync(args.config).toString());
-		console.log(config);
-
-		loadPlugins(config!).then(() => {
-			buildAll(config!);
-		});
-	});
-
-program
-	.command('watch')
-	.option('--config <path>', 'config file path', './ewiki.config.json')
-	.action((args) => {
-		config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(config!).then(() => {
-			watch(config!);
-		});
-	});
-
-program.parse();
-
-async function loadPlugins(config: Config) {
-	// 加载插件
-	const files = await glob(join(config.plugins_folder, '**/*.js').replace(/\\/g, '/'), {
-		ignore: config.ignore_plugins
-	});
-
-	for (const file of files) {
-		console.log(chalk.blueBright('load plugin') + ' : ' + file);
-		const plu = require(resolve(file)).default;
-		if (typeof plu === 'function') {
-			plugins.push(new plu());
-		} else {
-			plugins.push(plu);
-		}
-	}
-
-	console.log('plugins load finish\n');
 }
