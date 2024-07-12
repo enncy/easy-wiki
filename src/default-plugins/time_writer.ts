@@ -1,4 +1,3 @@
-import { DOMWindow } from 'jsdom';
 import { MarkdownContext, Plugin } from '../interface';
 import fs from 'fs';
 
