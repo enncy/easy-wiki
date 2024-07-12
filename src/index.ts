@@ -60,6 +60,8 @@ program.command('init').action(() => {
 		console.log(chalk.greenBright('template.html generated!'));
 		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), './style.css');
 		console.log(chalk.greenBright('style.css generated!'));
+		fs.writeFileSync('./README.md', '# Hello World');
+		console.log(chalk.greenBright('README.md generated!'));
 	}
 
 	console.log(chalk.greenBright('plugins folder generated!'));

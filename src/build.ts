@@ -4,15 +4,20 @@ import { resolve } from 'path';
 import { glob } from 'glob';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext } from './utils';
+import chalk from 'chalk';
 
 export async function buildReadme(cfg: Config) {
-	const readme = resolve(cfg.readme);
-	const content = fs.readFileSync(readme).toString('utf-8');
-	const info = getFileInfo(readme, cfg, getMarkdownContext(content), content);
-	info.dest = resolve('./index.html');
-	info.markdown_context.metadata.mount = info.markdown_context.metadata.mount || cfg.readme_mount;
-	renderMarkdownTo(info);
-	console.log('[easy-wiki builder] readme build finish!');
+	if (fs.existsSync(cfg.readme)) {
+		const readme = resolve(cfg.readme);
+		const content = fs.readFileSync(readme).toString('utf-8');
+		const info = getFileInfo(readme, cfg, getMarkdownContext(content), content);
+		info.dest = resolve('./index.html');
+		info.markdown_context.metadata.mount = info.markdown_context.metadata.mount || cfg.readme_mount;
+		renderMarkdownTo(info);
+		console.log('[easy-wiki builder] readme build finish!');
+	} else {
+		console.log('[easy-wiki builder] ' + chalk.yellowBright('readme not found'));
+	}
 }
 
 export async function buildAll(cfg: Config) {

@@ -19,8 +19,9 @@ export default class InfoWriterPlugin implements Plugin {
 
 		// 添加文件基本信息
 		const script = document.createElement('script');
-		info.filepath = info.filepath.replace(resolve(config.sources_folder), '').replace(/\\/g, '/');
-		info.dest = info.dest.replace(resolve(config.output_folder), '').replace(/\\/g, '/');
+		// 不暴露文件路径
+		info.filepath = info.filepath.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
+		info.dest = info.dest.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
 		script.innerHTML = `window.__ewiki_info__ = ${JSON.stringify(info)};`;
 		document.head.append(script);
 
