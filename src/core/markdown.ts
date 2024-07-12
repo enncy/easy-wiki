@@ -83,8 +83,17 @@ export function renderMarkdownTo(file_info: FileInfo) {
 		} else {
 			console.log('[easy-wiki] warn : mount element is not found', `file: ${file_info.filename}`, `mount: ${mount}`);
 		}
-	} else if (dom.window.document.querySelector(EWiki.config.readme_mount)) {
-		dom.window.document.querySelector(EWiki.config.readme_mount)!.innerHTML = html;
+	} else if (EWiki.config.readme_mount) {
+		const mount_le = dom.window.document.querySelector(EWiki.config.readme_mount);
+		if (mount_le) {
+			mount_le.innerHTML = html;
+		} else {
+			console.log(
+				'[easy-wiki] warn : mount element is not found',
+				`file: ${file_info.filename}`,
+				`mount: ${EWiki.config.readme_mount}`
+			);
+		}
 	} else {
 		dom.window.document.body.innerHTML = html;
 	}
