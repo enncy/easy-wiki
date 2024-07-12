@@ -86,7 +86,6 @@ function init() {
 	if (fs.existsSync('./ewiki.config.json')) {
 		console.log(chalk.gray('ewiki.config.json exists'));
 	} else {
-		console.log(chalk.greenBright('ewiki.config.json generated!'));
 		// 创建默认配置文件
 		fs.writeFileSync(
 			'./ewiki.config.json',
@@ -108,23 +107,24 @@ function init() {
 				4
 			)
 		);
-		// 将当前的默认样式文件和模版文件导入
-		const template_path = resolve(__dirname, '../assets/template.html');
-		const style_path = resolve(__dirname, '../assets/style.css');
-		const readme_path = resolve('./README.md');
-		if (fs.existsSync(template_path) === false) {
-			fs.copyFileSync(template_path, './template.html');
-			console.log(chalk.greenBright('template.html generated!'));
-		}
-		if (fs.existsSync(style_path) === false) {
-			fs.copyFileSync(style_path, './style.css');
-			console.log(chalk.greenBright('style.css generated!'));
-		}
+		console.log(chalk.greenBright('generated ewiki.config.json'));
+	}
 
-		if (fs.existsSync(readme_path) === false) {
-			fs.writeFileSync('./README.md', '# Hello World');
-			console.log(chalk.greenBright('README.md generated!'));
-		}
+	// 将当前的默认样式文件和模版文件导入
+	const template_path = resolve(__dirname, '../assets/template.html');
+	const style_path = resolve(__dirname, '../assets/style.css');
+	const readme_path = resolve('./README.md');
+	if (fs.existsSync(template_path) === false) {
+		fs.copyFileSync(template_path, './template.html');
+		console.log(chalk.greenBright('generated: template.html'));
+	}
+	if (fs.existsSync(style_path) === false) {
+		fs.copyFileSync(style_path, './style.css');
+		console.log(chalk.greenBright('generated: style.css'));
+	}
+	if (fs.existsSync(readme_path) === false) {
+		fs.writeFileSync('./README.md', '# Hello World');
+		console.log(chalk.greenBright('generated: README.md'));
 	}
 
 	console.log(chalk.greenBright('plugins folder generated!'));
