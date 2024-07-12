@@ -1,16 +1,16 @@
 import { Config } from '.';
 import { renderMarkdownTo } from './core/markdown';
-import { resolve } from 'path';
+import { basename, dirname, join, resolve } from 'path';
 import { glob } from 'glob';
 import fs from 'fs';
-import { getFileInfo, getMarkdownContext } from './utils';
+import { getFileInfo, getMarkdownContext, printBuildInfo } from './utils';
 import chalk from 'chalk';
 
 export async function buildReadme(cfg: Config) {
 	if (fs.existsSync(cfg.readme)) {
 		const readme = resolve(cfg.readme);
 		const content = fs.readFileSync(readme).toString('utf-8');
-		const info = getFileInfo(readme, cfg, getMarkdownContext(content), content);
+		const info = getFileInfo(readme, getMarkdownContext(content, true), content);
 		info.dest = resolve('./index.html');
 		info.markdown_context.metadata.mount = info.markdown_context.metadata.mount || cfg.readme_mount;
 		renderMarkdownTo(info);
@@ -29,7 +29,11 @@ export async function buildAll(cfg: Config) {
 
 	for (const info of infos) {
 		renderMarkdownTo(info);
-		console.log(chalk.blueBright('[easy-wiki builder] build-finish: ') + info.filepath + ' -> ' + info.dest);
+		printBuildInfo(info);
+	}
+
+	for (const plugin of EWiki.plugins) {
+		plugin.onRenderFinish?.();
 	}
 }
 
@@ -37,7 +41,7 @@ export async function createFileInfos(cfg: Config) {
 	const files = await glob(resolve(cfg.sources_folder, '**/*.md').replace(/\\/g, '/'), { ignore: cfg.ignore_sources });
 	const infos = files.map((file) => {
 		const file_content = fs.readFileSync(file).toString('utf-8');
-		return getFileInfo(resolve(file), cfg, getMarkdownContext(file_content), file_content);
+		return getFileInfo(resolve(file), getMarkdownContext(file_content, false), file_content);
 	});
 	return infos;
 }

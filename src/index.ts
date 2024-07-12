@@ -5,19 +5,21 @@ import { buildAll } from './build';
 import { watch } from './watch';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import { Plugin } from './interface';
 import { join, resolve } from 'path';
 import TimeWriterPlugin from './default-plugins/time_writer';
 import InfoWriterPlugin from './default-plugins/info_writer';
 
 console.log('[ewiki] start cwd: ' + process.cwd());
-
-export const plugins: Plugin[] = [new TimeWriterPlugin(), new InfoWriterPlugin()];
-export let config: Config = undefined as unknown as Config;
+global.EWiki = {
+	plugins: [new TimeWriterPlugin(), new InfoWriterPlugin()],
+	config: undefined as unknown as Config,
+	JSDOM: require('jsdom').JSDOM
+};
 
 export interface Config {
 	sources_folder: string;
 	plugins_folder: string;
+	scripts_folder: string;
 	output_folder: string;
 	ignore_sources: string[];
 	ignore_plugins: string[];
@@ -30,7 +32,10 @@ export interface Config {
 
 const program = new Command();
 
-program.command('init').action(init);
+program
+	.command('init')
+	.option('--config <path>', 'config file path', './ewiki.config.json')
+	.action((args) => init(args.config));
 
 // 直接设置为默认命令
 program
@@ -39,14 +44,14 @@ program
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
 			console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
-			init();
+			init(args.config);
 		}
 
-		config = JSON.parse(fs.readFileSync(args.config).toString());
-		console.log(config);
+		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
+		console.log(EWiki.config);
 
-		loadPlugins(config!).then(() => {
-			buildAll(config!);
+		loadPlugins(EWiki.config!).then(() => {
+			buildAll(EWiki.config!);
 		});
 	});
 
@@ -56,11 +61,11 @@ program
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
 			console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
-			init();
+			init(args.config);
 		}
-		config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(config!).then(() => {
-			watch(config!);
+		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
+		loadPlugins(EWiki.config!).then(() => {
+			watch(EWiki.config!);
 		});
 	});
 
@@ -76,24 +81,24 @@ async function loadPlugins(config: Config) {
 		console.log(chalk.blueBright('load plugin') + ' : ' + file);
 		const plu = require(resolve(file)).default;
 		if (typeof plu === 'function') {
-			plugins.push(new plu());
+			EWiki.plugins.push(new plu());
 		} else {
-			plugins.push(plu);
+			EWiki.plugins.push(plu);
 		}
 	}
 
 	console.log('plugins load finish\n');
 }
 
-function init() {
+function init(config_path: string) {
 	let changes = false;
 
-	if (fs.existsSync('./ewiki.config.json') == false) {
+	if (fs.existsSync(config_path) == false) {
 		changes = true;
 		console.log(chalk.gray('ewiki.config.json exists'));
 		// 创建默认配置文件
 		fs.writeFileSync(
-			'./ewiki.config.json',
+			config_path,
 			JSON.stringify(
 				{
 					sources_folder: './sources',
@@ -112,29 +117,42 @@ function init() {
 				4
 			)
 		);
-		console.log(chalk.greenBright('generated: [file] ewiki.config.json'));
+		console.log(chalk.greenBright('generated: [file] ' + config_path));
 	}
 
+	const cfg: Config = JSON.parse(fs.readFileSync(config_path).toString());
+
+	// 初始化文件夹
+	[cfg.plugins_folder, cfg.sources_folder, cfg.scripts_folder, cfg.output_folder].forEach((folder) => {
+		const target = resolve(process.cwd(), folder);
+		if (fs.existsSync(target) === false) {
+			changes = true;
+			fs.mkdirSync(target, { recursive: true });
+			console.log(chalk.greenBright('generated: [folder] ' + folder));
+		}
+	});
+
 	// 将当前的默认样式文件和模版文件导入
-	const template_path = resolve(process.cwd(), './template.html');
-	const style_path = resolve(process.cwd(), './style.css');
-	const readme_path = resolve(process.cwd(), './README.md');
-	const plugins_folder = resolve(process.cwd(), './plugins');
+
+	const template_path = resolve(process.cwd(), cfg.html_template);
+	const style_path = resolve(process.cwd(), cfg.styles[0]);
+	const readme_path = resolve(process.cwd(), cfg.readme);
 	const type_path = resolve(process.cwd(), './env.d.ts');
+
 	if (fs.existsSync(template_path) === false) {
 		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), template_path);
-		console.log(chalk.greenBright('generated: [file] template.html'));
+		console.log(chalk.greenBright('generated: [file] ' + cfg.html_template));
 	}
 	if (fs.existsSync(style_path) === false) {
 		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), style_path);
-		console.log(chalk.greenBright('generated: [file] style.css'));
+		console.log(chalk.greenBright('generated: [file] ' + cfg.styles[0]));
 	}
 	if (fs.existsSync(readme_path) === false) {
 		changes = true;
 		fs.writeFileSync(readme_path, '# Hello World');
-		console.log(chalk.greenBright('generated: [file] README.md'));
+		console.log(chalk.greenBright('generated: [file] ' + cfg.readme));
 	}
 
 	// 类型文件
@@ -142,12 +160,6 @@ function init() {
 		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../lib/interface.d.ts'), type_path);
 		console.log(chalk.greenBright('generated: [file] env.d.ts'));
-	}
-
-	if (fs.existsSync(plugins_folder) === false) {
-		changes = true;
-		fs.mkdirSync(plugins_folder, { recursive: true });
-		console.log(chalk.greenBright('generated: [folder] plugins'));
 	}
 
 	if (changes === false) {

@@ -1,4 +1,7 @@
 
+// @ts-check
+
+
 const fs = require('fs');
 const { resolve } = require('path');
 
@@ -13,11 +16,7 @@ const el = (document, tag, html) => {
 
 /** @type {import('../../lib/interface.d.ts').Plugin} */
 exports.default = {
-	onMarkdownItInit(markdownIt) {
-	},
-	onMarkdownCreate(filepath, ctx) { },
-	onMarkdownChange(filepath, ctx) { },
-	onHtmlFileRender(filepath, ctx, { document }) {
+	onHtmlFileRender(filepath, dest, ctx, { document }) {
 		document.head.append(el(document, 'style', hljs_github_style));
 		document.head.append(el(document, 'style', bootstrap_style));
 

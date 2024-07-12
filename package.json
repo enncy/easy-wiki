@@ -39,6 +39,7 @@
 		"highlight.js": "^11.10.0",
 		"jsdom": "^24.1.0",
 		"less": "^4.2.0",
+		"lodash": "^4.17.21",
 		"markdown-it": "^14.1.0",
 		"markdown-it-anchor": "^9.0.1",
 		"markdown-it-container": "^4.0.0",
@@ -46,6 +47,7 @@
 	},
 	"devDependencies": {
 		"@types/jsdom": "^21.1.7",
+		"@types/lodash": "^4.17.6",
 		"@types/markdown-it-container": "^2.0.10",
 		"@types/node": "^20.14.10"
 	}

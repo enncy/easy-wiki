@@ -1,7 +1,6 @@
 import { DOMWindow } from 'jsdom';
 import { MarkdownContext, Plugin } from '../interface';
 import { getFileInfo } from '../utils';
-import { config } from '..';
 import chalk from 'chalk';
 import { resolve } from 'path';
 import fs from 'fs';
@@ -10,11 +9,8 @@ const style_caches: Record<string, string> = {};
 const style_errored: Record<string, string> = {};
 
 export default class InfoWriterPlugin implements Plugin {
-	onMarkdownItInit(markdownIt: import('markdown-it')) {}
-	onMarkdownCreate(filepath: string, ctx: MarkdownContext): void {}
-	onMarkdownChange(filepath: string, ctx: MarkdownContext): void {}
-	onHtmlFileRender(filepath: string, ctx: MarkdownContext, window: DOMWindow) {
-		const info = getFileInfo(filepath, config, ctx);
+	onHtmlFileRender(filepath: string, dest: string, ctx: MarkdownContext, window: DOMWindow) {
+		const info = getFileInfo(filepath, ctx);
 		const document = window.document;
 
 		// 添加文件基本信息
@@ -26,7 +22,7 @@ export default class InfoWriterPlugin implements Plugin {
 		document.head.append(script);
 
 		// 添加样式文件
-		[...config.styles, ...(ctx.metadata.styles || [])].forEach((style) => {
+		[...EWiki.config.styles, ...(ctx.metadata.styles?.split(',') || [])].forEach((style) => {
 			if (style_errored[style]) {
 				return;
 			}

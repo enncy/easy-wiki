@@ -1,9 +1,9 @@
 import chokidar from 'chokidar';
 import chalk from 'chalk';
 import { resolve, join } from 'path';
-import { Config, plugins } from '.';
+import { Config } from '.';
 import fs from 'fs';
-import { getFileInfo, getMarkdownContext, parseMarkdownContext } from './utils';
+import { getFileInfo, getMarkdownContext, parseMarkdownContext, printBuildInfo } from './utils';
 import { renderMarkdownTo } from './core/markdown';
 import { buildReadme } from './build';
 
@@ -15,22 +15,22 @@ export function watch(cfg: Config) {
 	}
 	chokidar.watch(cfg.readme).on('change', () => buildReadme(cfg));
 
-	chokidar.watch(join(cfg.sources_folder, '**/*.md'), { ignored: cfg.ignore_sources }).on('change', onChange);
+	chokidar.watch(join(cfg.sources_folder, '**/*.md'), { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
+		onChange(path, stats, false);
+	});
 
-	function onChange(path: string, stats: fs.Stats | undefined) {
+	const onChange = (path: string, stats: fs.Stats | undefined, is_readme_file: boolean) => {
 		if (stats?.isFile()) {
 			const file_content = fs.readFileSync(path).toString('utf-8');
-			const ctx = getMarkdownContext(file_content);
-			const info = getFileInfo(resolve(path), cfg, ctx, file_content);
-			for (const plugin of plugins) {
-				plugin.onMarkdownChange(resolve(path), ctx);
+			const ctx = getMarkdownContext(file_content, is_readme_file);
+			const info = getFileInfo(resolve(path), ctx, file_content);
+			for (const plugin of EWiki.plugins) {
+				plugin.onMarkdownChange?.(resolve(path), ctx);
 			}
 			info.file_content = parseMarkdownContext(ctx);
 			fs.writeFileSync(path, info.file_content);
-
 			renderMarkdownTo(info);
-
-			console.log(chalk.blueBright('[easy-wiki watcher] build-finish: ') + path + ' -> ' + info.dest);
+			printBuildInfo(info);
 		}
-	}
+	};
 }
