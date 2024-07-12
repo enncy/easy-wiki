@@ -15,5 +15,11 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"editor.wordBasedSuggestions": "off",
-	"cSpell.words": ["ewiki"]
+	"cSpell.words": ["ewiki"],
+	/** 样式自动生成 */
+	"less.compile": {
+		"compress": false,
+		"sourceMap": false,
+		"out": "../style/"
+	}
 }

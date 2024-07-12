@@ -17,7 +17,7 @@ export function getMarkdownContext(content: string) {
 		const [key, value] = line.split('=');
 		metadata[key] = value;
 	}
-	return { metadata, content: _content };
+	return { metadata, content: _content || content };
 }
 
 export function parseMarkdownContext(ctx: MarkdownContext) {

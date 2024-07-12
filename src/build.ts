@@ -5,7 +5,21 @@ import { glob } from 'glob';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext } from './utils';
 
+export async function buildReadme(cfg: Config) {
+	const readme = resolve(cfg.readme);
+	const content = fs.readFileSync(readme).toString('utf-8');
+	const info = getFileInfo(readme, cfg, getMarkdownContext(content), content);
+	info.dest = resolve('./index.html');
+	info.markdown_context.metadata.mount = info.markdown_context.metadata.mount || cfg.readme_mount;
+	renderMarkdownTo(info);
+	console.log('[easy-wiki builder] readme build finish!');
+}
+
 export async function buildAll(cfg: Config) {
+	if (cfg.readme) {
+		buildReadme(cfg);
+	}
+
 	const infos = await createFileInfos(cfg);
 
 	for (const info of infos) {

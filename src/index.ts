@@ -7,8 +7,8 @@ import chalk from 'chalk';
 import { glob } from 'glob';
 import { Plugin } from './interface';
 import { join, resolve } from 'path';
-import TimeWriterPlugin from './plugins/time_writer';
-import InfoWriterPlugin from './plugins/info_writer';
+import TimeWriterPlugin from './default-plugins/time_writer';
+import InfoWriterPlugin from './default-plugins/info_writer';
 
 export const plugins: Plugin[] = [new TimeWriterPlugin(), new InfoWriterPlugin()];
 export let config: Config = undefined as unknown as Config;
@@ -21,6 +21,8 @@ export interface Config {
 	ignore_plugins: string[];
 	styles: string[];
 	html_template: string;
+	readme: string;
+	readme_mount: string;
 	markdown_it_config: Record<string, any>;
 }
 
@@ -44,6 +46,8 @@ program.command('init').action(() => {
 					ignore_plugins: ['./plugins/**/*.ignore.js'],
 					html_template: './template.html',
 					styles: ['./style.css'],
+					readme: './README.md',
+					readme_mount: 'body',
 					markdown_it_config: {}
 				} as Config,
 				null,
@@ -65,39 +69,43 @@ program.command('init').action(() => {
 
 program
 	.command('build')
-	.version('1.0.0')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(config!);
-		buildAll(config!);
+		console.log(config);
+
+		loadPlugins(config!).then(() => {
+			buildAll(config!);
+		});
 	});
 
 program
 	.command('watch')
-	.version('1.0.0')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(config!);
-		watch(config!);
+		loadPlugins(config!).then(() => {
+			watch(config!);
+		});
 	});
 
-program.parse(process.argv);
+program.parse();
 
-function loadPlugins(config: Config) {
+async function loadPlugins(config: Config) {
 	// 加载插件
-	glob(join(config.plugins_folder, '**/*.js').replace(/\\/g, '/'), { ignore: config.ignore_plugins }).then((files) => {
-		for (const file of files) {
-			console.log('load plugin : ' + file);
-			const plu = require(resolve(file)).default;
-			if (typeof plu === 'function') {
-				plugins.push(new plu());
-			} else {
-				plugins.push(plu);
-			}
-		}
-
-		console.log('plugins load finish\n');
+	const files = await glob(join(config.plugins_folder, '**/*.js').replace(/\\/g, '/'), {
+		ignore: config.ignore_plugins
 	});
+
+	for (const file of files) {
+		console.log(chalk.blueBright('load plugin') + ' : ' + file);
+		const plu = require(resolve(file)).default;
+		if (typeof plu === 'function') {
+			plugins.push(new plu());
+		} else {
+			plugins.push(plu);
+		}
+	}
+
+	console.log('plugins load finish\n');
 }

@@ -25,7 +25,7 @@ export default class InfoWriterPlugin implements Plugin {
 		document.head.append(script);
 
 		// 添加样式文件
-		config.styles.forEach((style) => {
+		[...config.styles, ...(ctx.metadata.styles || [])].forEach((style) => {
 			if (style_errored[style]) {
 				return;
 			}
@@ -45,7 +45,7 @@ export default class InfoWriterPlugin implements Plugin {
 					style_content = style_caches[style];
 				} else {
 					if (fs.existsSync(style)) {
-						style_content = fs.readFileSync(style).toString('utf-8');
+						style_content = fs.readFileSync(style).toString('utf-8').replace(/\n/g, '');
 						style_caches[style] = style_content;
 					} else {
 						style_errored[style] = 'true';
@@ -53,7 +53,6 @@ export default class InfoWriterPlugin implements Plugin {
 						return;
 					}
 				}
-
 				const style_tag = document.createElement('style');
 				style_tag.innerHTML = style_content;
 				document.head.append(style_tag);
