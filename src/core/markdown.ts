@@ -83,6 +83,8 @@ export function renderMarkdownTo(file_info: FileInfo) {
 		} else {
 			console.log('[easy-wiki] warn : mount element is not found', `file: ${file_info.filename}`, `mount: ${mount}`);
 		}
+	} else if (dom.window.document.querySelector(EWiki.config.readme_mount)) {
+		dom.window.document.querySelector(EWiki.config.readme_mount)!.innerHTML = html;
 	} else {
 		dom.window.document.body.innerHTML = html;
 	}
