@@ -7,3 +7,5 @@ sidebar_base=/easy-wiki/
 ------ewiki-config------
 
 # hello world
+
+test
