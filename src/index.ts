@@ -86,9 +86,11 @@ async function loadPlugins(config: Config) {
 }
 
 function init() {
-	if (fs.existsSync('./ewiki.config.json')) {
+	let changes = false;
+
+	if (fs.existsSync('./ewiki.config.json') == false) {
+		changes = true;
 		console.log(chalk.gray('ewiki.config.json exists'));
-	} else {
 		// 创建默认配置文件
 		fs.writeFileSync(
 			'./ewiki.config.json',
@@ -110,26 +112,37 @@ function init() {
 				4
 			)
 		);
-		console.log(chalk.greenBright('generated: ewiki.config.json'));
+		console.log(chalk.greenBright('generated: [file] ewiki.config.json'));
 	}
 
 	// 将当前的默认样式文件和模版文件导入
 	const template_path = resolve(process.cwd(), './template.html');
 	const style_path = resolve(process.cwd(), './style.css');
 	const readme_path = resolve(process.cwd(), './README.md');
+	const plugins_folder = resolve(process.cwd(), './plugins');
 	if (fs.existsSync(template_path) === false) {
+		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), template_path);
-		console.log(chalk.greenBright('generated: template.html'));
+		console.log(chalk.greenBright('generated: [file] template.html'));
 	}
 	if (fs.existsSync(style_path) === false) {
+		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), style_path);
-		console.log(chalk.greenBright('generated: style.css'));
+		console.log(chalk.greenBright('generated: [file] style.css'));
 	}
 	if (fs.existsSync(readme_path) === false) {
+		changes = true;
 		fs.writeFileSync(readme_path, '# Hello World');
-		console.log(chalk.greenBright('generated: README.md'));
+		console.log(chalk.greenBright('generated: [file] README.md'));
 	}
 
-	console.log(chalk.greenBright('plugins folder generated!'));
-	fs.mkdirSync(resolve(process.cwd(), './plugins'), { recursive: true });
+	if (fs.existsSync(plugins_folder) === false) {
+		changes = true;
+		fs.mkdirSync(plugins_folder, { recursive: true });
+		console.log(chalk.greenBright('generated: [folder] plugins'));
+	}
+
+	if (changes === false) {
+		console.log(chalk.greenBright('nothing changes'));
+	}
 }
