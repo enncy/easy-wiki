@@ -114,16 +114,15 @@ function init() {
 	// 将当前的默认样式文件和模版文件导入
 	const template_path = resolve(__dirname, '../assets/template.html');
 	const style_path = resolve(__dirname, '../assets/style.css');
-	const readme_path = resolve('./README.md');
-	if (fs.existsSync(template_path) === false) {
+	if (fs.existsSync('./template.html') === false) {
 		fs.copyFileSync(template_path, './template.html');
 		console.log(chalk.greenBright('generated: template.html'));
 	}
-	if (fs.existsSync(style_path) === false) {
+	if (fs.existsSync('./style.css') === false) {
 		fs.copyFileSync(style_path, './style.css');
 		console.log(chalk.greenBright('generated: style.css'));
 	}
-	if (fs.existsSync(readme_path) === false) {
+	if (fs.existsSync('./README.md') === false) {
 		fs.writeFileSync('./README.md', '# Hello World');
 		console.log(chalk.greenBright('generated: README.md'));
 	}
