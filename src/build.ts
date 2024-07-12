@@ -29,7 +29,7 @@ export async function buildAll(cfg: Config) {
 
 	for (const info of infos) {
 		renderMarkdownTo(info);
-		console.log('[easy-wiki builder] build-finish: ' + info.filepath + ' -> ' + info.dest);
+		console.log(chalk.blueBright('[easy-wiki builder] build-finish: ') + info.filepath + ' -> ' + info.dest);
 	}
 }
 

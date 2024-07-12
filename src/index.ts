@@ -10,6 +10,8 @@ import { join, resolve } from 'path';
 import TimeWriterPlugin from './default-plugins/time_writer';
 import InfoWriterPlugin from './default-plugins/info_writer';
 
+console.log('[ewiki] start cwd: ' + process.cwd());
+
 export const plugins: Plugin[] = [new TimeWriterPlugin(), new InfoWriterPlugin()];
 export let config: Config = undefined as unknown as Config;
 
@@ -32,7 +34,7 @@ program.command('init').action(init);
 
 // 直接设置为默认命令
 program
-	.version('0.0.1')
+	.version('0.0.2')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
@@ -108,25 +110,26 @@ function init() {
 				4
 			)
 		);
-		console.log(chalk.greenBright('generated ewiki.config.json'));
+		console.log(chalk.greenBright('generated: ewiki.config.json'));
 	}
 
 	// 将当前的默认样式文件和模版文件导入
-	const template_path = resolve(__dirname, '../assets/template.html');
-	const style_path = resolve(__dirname, '../assets/style.css');
-	if (fs.existsSync('./template.html') === false) {
-		fs.copyFileSync(template_path, './template.html');
+	const template_path = resolve(process.cwd(), './template.html');
+	const style_path = resolve(process.cwd(), './style.css');
+	const readme_path = resolve(process.cwd(), './README.md');
+	if (fs.existsSync(template_path) === false) {
+		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), template_path);
 		console.log(chalk.greenBright('generated: template.html'));
 	}
-	if (fs.existsSync('./style.css') === false) {
-		fs.copyFileSync(style_path, './style.css');
+	if (fs.existsSync(style_path) === false) {
+		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), style_path);
 		console.log(chalk.greenBright('generated: style.css'));
 	}
-	if (fs.existsSync('./README.md') === false) {
-		fs.writeFileSync('./README.md', '# Hello World');
+	if (fs.existsSync(readme_path) === false) {
+		fs.writeFileSync(readme_path, '# Hello World');
 		console.log(chalk.greenBright('generated: README.md'));
 	}
 
 	console.log(chalk.greenBright('plugins folder generated!'));
-	fs.mkdirSync('./plugins', { recursive: true });
+	fs.mkdirSync(resolve(process.cwd(), './plugins'), { recursive: true });
 }

@@ -30,7 +30,7 @@ export function watch(cfg: Config) {
 
 			renderMarkdownTo(info);
 
-			console.log('[easy-wiki watcher] build-finish: ' + path + ' -> ' + info.dest);
+			console.log(chalk.blueBright('[easy-wiki watcher] build-finish: ') + path + ' -> ' + info.dest);
 		}
 	}
 }
