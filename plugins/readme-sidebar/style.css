@@ -18,6 +18,7 @@ html {
 .container {
 	max-width: 1200px;
 	min-width: 400px;
+	min-height: 100%;
 	margin: auto;
 	display: flex;
 	background-color: #ffffff;
