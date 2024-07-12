@@ -37,7 +37,7 @@ html {
 	text-wrap: nowrap;
 	overflow: auto;
 	max-width: 180px;
-	top: 0px;
+	top: 12px;
 	position: sticky;
 }
 
@@ -74,7 +74,4 @@ summary {
 details a {
 	margin-left: 16px;
 	color: #1890ff;
-}
-
-details.openable[open] summary {
 }
