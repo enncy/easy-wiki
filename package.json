@@ -1,5 +1,8 @@
 {
+  "scripts": {
+    "publish": "git add . && git commit -m 'publish' && git push origin"
+  },
   "devDependencies": {
-    "ewiki": "^0.0.13"
+    "ewiki": "^0.0.14"
   }
 }
