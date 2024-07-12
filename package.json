@@ -1,5 +1,5 @@
 {
-	"name": "easy-wiki",
+	"name": "ewiki",
 	"version": "0.0.5",
 	"description": "easy-wiki",
 	"main": "./lib/index.js",

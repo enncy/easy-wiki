@@ -30,8 +30,9 @@ const program = new Command();
 
 program.command('init').action(init);
 
+// 直接设置为默认命令
 program
-	.command('build')
+	.version('0.0.1')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
