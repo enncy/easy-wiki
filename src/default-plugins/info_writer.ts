@@ -48,7 +48,9 @@ export default class InfoWriterPlugin implements Plugin {
 						script_caches[script] = script_content;
 					} else {
 						script_errored[script] = 'true';
-						console.error(`${chalk.redBright('[info-writer]')} script file not found: ${script}`);
+						console.error(
+							`${chalk.redBright('[info-writer]')} error in (${filepath}) : script file not found: ${script}`
+						);
 						return;
 					}
 				}
@@ -57,7 +59,9 @@ export default class InfoWriterPlugin implements Plugin {
 				document.body.append(script_tag);
 			} else {
 				script_errored[script] = 'true';
-				console.error(`${chalk.redBright('[info-writer]')} script file not support: ${script}`);
+				console.error(
+					`${chalk.redBright('[info-writer]')} error in (${filepath}) : script file not support: ${script}`
+				);
 			}
 		});
 
@@ -86,7 +90,9 @@ export default class InfoWriterPlugin implements Plugin {
 						style_caches[style] = style_content;
 					} else {
 						style_errored[style] = 'true';
-						console.error(`${chalk.redBright('[info-writer]')} style file not found: ${style}`);
+						console.error(
+							`${chalk.redBright('[info-writer]')} error in (${filepath}) : style file not found: ${style}`
+						);
 						return;
 					}
 				}
@@ -95,7 +101,7 @@ export default class InfoWriterPlugin implements Plugin {
 				document.head.append(style_tag);
 			} else {
 				style_errored[style] = 'true';
-				console.error(`${chalk.redBright('[info-writer]')} style file not support: ${style}`);
+				console.error(`${chalk.redBright('[info-writer]')} error in (${filepath}) : style file not support: ${style}`);
 			}
 		});
 	}

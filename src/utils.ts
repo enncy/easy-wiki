@@ -5,7 +5,7 @@ import { Config } from '.';
 import chalk from 'chalk';
 
 export function getMarkdownContext(content: string, is_readme_file: boolean) {
-	const [_, info, _content] = content.match(/------ewiki-config------([\s\S]+)------ewiki-config------([\s\S]+)/) || [];
+	const [_, info, _content] = content.match(/------ewiki-config------([\s\S]+)------ewiki-config------([\s\S]*)/) || [];
 
 	const lines =
 		(info ? String(info) : '')

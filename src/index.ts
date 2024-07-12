@@ -39,7 +39,7 @@ program
 
 // 直接设置为默认命令
 program
-	.version('0.0.2')
+	.version('0.0.3')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
@@ -48,8 +48,6 @@ program
 		}
 
 		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
-		console.log(EWiki.config);
-
 		loadPlugins(EWiki.config!).then(() => {
 			buildAll(EWiki.config!);
 		});
@@ -57,6 +55,7 @@ program
 
 program
 	.command('watch')
+	.version('0.0.3')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {

@@ -4,6 +4,7 @@ import fs from 'fs';
 import { JSDOM } from 'jsdom';
 import { dirname, resolve } from 'path';
 import { FileInfo } from '../interface';
+import chalk from 'chalk';
 
 export let MarkdownItInstance = undefined as undefined | MarkdownIt;
 
@@ -59,7 +60,15 @@ export function renderMarkdownTo(file_info: FileInfo) {
 	const defined_template = file_info.markdown_context.metadata.template;
 	const mount = file_info.markdown_context.metadata.mount;
 	if (defined_template) {
-		template = fs.readFileSync(resolve(defined_template)).toString('utf-8');
+		if (fs.existsSync(defined_template) === false) {
+			console.log(
+				'[easy-wiki] error : ' + chalk.redBright('template file is not found'),
+				`file: ${file_info.filename}`,
+				`template: ${defined_template}`
+			);
+			return false;
+		}
+		template = fs.readFileSync(resolve(process.cwd(), defined_template)).toString('utf-8');
 	} else {
 		template = fs.readFileSync(resolve(EWiki.config.html_template)).toString('utf-8');
 	}
@@ -85,4 +94,5 @@ export function renderMarkdownTo(file_info: FileInfo) {
 		fs.mkdirSync(dirname(file_info.dest), { recursive: true });
 	}
 	fs.writeFileSync(file_info.dest, dom.serialize());
+	return true;
 }

@@ -10,30 +10,39 @@ export async function buildReadme(cfg: Config) {
 	if (fs.existsSync(cfg.readme)) {
 		const readme = resolve(cfg.readme);
 		const content = fs.readFileSync(readme).toString('utf-8');
-		const info = getFileInfo(readme, getMarkdownContext(content, true), content);
+		const ctx = getMarkdownContext(content, true);
+		const info = getFileInfo(readme, ctx, content);
 		info.dest = resolve('./index.html');
 		info.markdown_context.metadata.mount = info.markdown_context.metadata.mount || cfg.readme_mount;
-		renderMarkdownTo(info);
-		console.log('[easy-wiki builder] readme build finish!');
+		if (renderMarkdownTo(info)) {
+			console.log('[easy-wiki builder] readme build finish!');
+			return info;
+		}
 	} else {
 		console.log('[easy-wiki builder] ' + chalk.yellowBright('readme not found'));
 	}
 }
 
 export async function buildAll(cfg: Config) {
+	let readme_info;
 	if (cfg.readme) {
-		buildReadme(cfg);
+		readme_info = await buildReadme(cfg);
 	}
 
-	const infos = await createFileInfos(cfg);
+	let infos = await createFileInfos(cfg);
 
 	for (const info of infos) {
-		renderMarkdownTo(info);
-		printBuildInfo(info);
+		if (renderMarkdownTo(info)) {
+			printBuildInfo(info);
+		}
+	}
+
+	if (readme_info) {
+		infos = [readme_info, ...infos];
 	}
 
 	for (const plugin of EWiki.plugins) {
-		plugin.onRenderFinish?.();
+		plugin.onRenderFinish?.(infos);
 	}
 }
 

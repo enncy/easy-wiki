@@ -44,7 +44,7 @@ export type Plugin = {
 	 */
 	onHtmlFileRender?: (filepath: string, dest: string, ctx: MarkdownContext, window: DOMWindow) => void;
 	/** 当使用 build 命令完成全部渲染时调用 */
-	onRenderFinish?: () => void;
+	onRenderFinish?: (file_info: FileInfo[]) => void;
 };
 
 export type FileInfo = ReturnType<typeof getFileInfo>;

@@ -1,0 +1,80 @@
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	font-family: Arial, sans-serif;
+	background-color: #f3f3f3;
+}
+
+.wrapper {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	background-color: #f3f3f3;
+}
+
+.container {
+	max-width: 1200px;
+	min-width: 400px;
+	margin: auto;
+	display: flex;
+	background-color: #ffffff;
+}
+.sidebar-wrapper {
+	flex: 0 180px;
+	border-right: 1px solid #a7a7a7;
+}
+
+.markdown-wrapper {
+	flex: 0 auto;
+	padding: 0px 24px;
+}
+
+.sidebar {
+	margin-top: 24px;
+	text-wrap: nowrap;
+	overflow: auto;
+	max-width: 180px;
+	top: 0px;
+	position: sticky;
+}
+
+.sidebar details {
+	border-radius: 4px;
+	margin: 8px 0px;
+	display: flex;
+	gap: 4px;
+}
+
+details details {
+	padding-left: 18px;
+}
+
+details > summary::before {
+	content: '+';
+	float: left;
+	width: 6px;
+	margin-right: 8px;
+}
+
+details[open] > summary::before {
+	content: '-';
+	float: left;
+	width: 6px;
+	margin-right: 8px;
+}
+
+summary {
+	font-weight: bold;
+	cursor: pointer;
+}
+
+details a {
+	margin-left: 16px;
+	color: #1890ff;
+}
+
+details.openable[open] summary {
+}
