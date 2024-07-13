@@ -15,7 +15,7 @@ export default class TimeWriterPlugin implements Plugin {
 			if (!!ctx.metadata.create_at === false) {
 				ctx.metadata.create_at = fs.statSync(info.filepath).birthtime.toLocaleString();
 			}
-			ctx.metadata.create_at = new Date(info.create_at).toLocaleString();
+			ctx.metadata.update_at = new Date().toLocaleString();
 			const md_content = parseMarkdownContext(ctx);
 			// 自动更新文件信息
 			fs.writeFileSync(info.filepath, md_content);
