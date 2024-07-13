@@ -36,8 +36,19 @@ exports.default = {
             return
         }
 
+
+        // 各个文件基本信息，添加到 html 中方便脚本处理
+        const raw_infos = JSON.parse(JSON.stringify([readme_info, ...sources])).map(info => {
+            // 不暴露文件路径
+            info.filepath = info.filepath.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
+            info.dest = info.dest.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
+            Object.assign(info, { text: new EWiki.JSDOM(info.rendered_html).window.document.querySelector('.markdown-body')?.textContent || '' })
+            Reflect.deleteProperty(info, 'rendered_html')
+            return info
+        })
+
         for (const file_info of infos) {
-            buildFile(readme_info, sources, file_info)
+            buildFile(readme_info, sources, file_info, raw_infos)
         }
     }
 }
@@ -49,6 +60,7 @@ function buildFile(
     sources,
     /** @type {import('../../lib/index.d.ts').FileInfo} */
     file_info,
+    raw_infos
 ) {
     fs.readFile(file_info.dest, { encoding: 'utf-8' }, (err, html) => {
         if (err) {
@@ -60,14 +72,6 @@ function buildFile(
 
         // 添加全局变量信息
         const script = document.createElement('script');
-        const raw_infos = JSON.parse(JSON.stringify([readme_info, ...sources])).map(info => {
-            // 不暴露文件路径
-            info.filepath = info.filepath.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
-            info.dest = info.dest.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
-            Object.assign(info, { text: new EWiki.JSDOM(info.rendered_html).window.document.querySelector('.markdown-body')?.textContent || '' })
-            Reflect.deleteProperty(info, 'rendered_html')
-            return info
-        })
         script.innerHTML = `window.__ewiki_files_info__ = JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(raw_infos))}"));`;
         document.head.append(script);
 

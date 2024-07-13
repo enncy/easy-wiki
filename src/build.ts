@@ -5,6 +5,7 @@ import { glob } from 'glob';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext, printBuildInfo } from './utils';
 import chalk from 'chalk';
+import { FileInfo } from './interface';
 
 export async function buildReadme(cfg: Config) {
 	if (fs.existsSync(cfg.readme)) {
@@ -52,9 +53,16 @@ export async function buildAll(cfg: Config) {
 
 export async function createFileInfos(cfg: Config) {
 	const files = await glob(cfg.sources, { ignore: cfg.ignore_sources });
-	const infos = files.map((file) => {
-		const file_content = fs.readFileSync(file).toString('utf-8');
-		return getFileInfo(resolve(file), getMarkdownContext(file_content, false), file_content);
-	});
-	return infos;
+	return Promise.all(
+		files.map((file) => {
+			return new Promise<FileInfo>((resolve_promise, reject) => {
+				fs.readFile(file, { encoding: 'utf-8' }, (err, file_content) => {
+					if (err) {
+						return console.log('[easy-wiki builder] ' + chalk.redBright('error') + ' : ' + err);
+					}
+					resolve_promise(getFileInfo(resolve(file), getMarkdownContext(file_content, false), file_content));
+				});
+			});
+		})
+	);
 }
