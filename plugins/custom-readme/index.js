@@ -91,11 +91,13 @@ function buildFile(
 
 
         // 添加首页链接
+        const sidebar_url_base = readme_info.markdown_context.metadata.sidebar_url_base.endsWith('/') ? readme_info.markdown_context.metadata.sidebar_url_base.slice(0, -1) : readme_info.markdown_context.metadata.sidebar_url_base
+
         const parts = getFilepathParts(readme_info.filepath)
         const a = document.createElement('a')
         const name = readme_info.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
         a.textContent = name
-        a.setAttribute('href', (readme_info.markdown_context.metadata.sidebar_url_base || '') + join(readme_info.dest.replace(process.cwd(), '')).replace(/\\/g, '/'))
+        a.setAttribute('href', (sidebar_url_base || '') + join(readme_info.dest.replace(process.cwd(), '')).replace(/\\/g, '/'))
         sidebar.append(a)
 
         // 生成各级别父元素
@@ -138,7 +140,7 @@ function buildFile(
             if (source.markdown_context.metadata.sidebar != undefined) {
                 const name = source.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                 a.textContent = name
-                const href = (readme_info.markdown_context.metadata.sidebar_url_base || '') + join(source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
+                const href = (sidebar_url_base || '') + join(source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
                 a.setAttribute('href', href)
                 if (folder) {
                     folder.appendChild(a)
