@@ -4,15 +4,23 @@ import type MarkdownIt from 'markdown-it';
 import { getFileInfo } from './utils';
 import { Config } from './cmd';
 
+/** 全局对象 */
 declare global {
 	var EWiki: {
+		/** 配置文件 */
 		config: Config;
+		/** 全部已加载插件列表 */
 		plugins: Plugin[];
+		/** 模拟浏览器模块对象，文档：https://www.npmjs.com/package/jsdom  */
 		JSDOM: typeof jsdom.JSDOM;
 	};
 }
 
+/**
+ * markdown 上下文，解析后的 markdown 文件会被转换为这个对象
+ */
 export interface MarkdownContext {
+	/** 除了元数据之外的md文本 */
 	content: string;
 	metadata: {
 		/** 输出绑定在页面上的元素，默认是 body ，可以根据template字段进行自定义 */
@@ -47,4 +55,20 @@ export type Plugin = {
 	onRenderFinish?: (file_info: (FileInfo & { rendered_html: string })[]) => void;
 };
 
-export type FileInfo = ReturnType<typeof getFileInfo>;
+/**
+ * 文件信息
+ */
+export interface FileInfo {
+	dirname: string;
+	filename: string;
+	filepath: string;
+	dest: string;
+	create_at: number;
+	update_at: number;
+	file_content: string;
+	markdown_context: MarkdownContext;
+	/**
+	 * 在最后一步渲染文件后，会将渲染后的html内容保存在这个字段中
+	 */
+	rendered_html?: string;
+}
