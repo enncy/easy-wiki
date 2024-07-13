@@ -5,7 +5,7 @@ import { buildAll } from './build';
 import { watch } from './watch';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import TimeWriterPlugin from './default-plugins/time_writer';
 import InfoWriterPlugin from './default-plugins/info_writer';
 
@@ -17,9 +17,8 @@ global.EWiki = {
 };
 
 export interface Config {
-	sources_folder: string;
-	plugins_folder: string;
-	scripts_folder: string;
+	sources: string[];
+	plugins: string[];
 	output_folder: string;
 	ignore_sources: string[];
 	ignore_plugins: string[];
@@ -72,7 +71,7 @@ program.parse();
 
 async function loadPlugins(config: Config) {
 	// 加载插件
-	const files = await glob(join(config.plugins_folder, '**/*.js').replace(/\\/g, '/'), {
+	const files = await glob(config.plugins, {
 		ignore: config.ignore_plugins
 	});
 
@@ -85,6 +84,11 @@ async function loadPlugins(config: Config) {
 			EWiki.plugins.push(plu);
 		}
 	}
+
+	// 排序
+	EWiki.plugins = EWiki.plugins.sort((a, b) => {
+		return (a.priority || 0) - (b.priority || 0);
+	});
 
 	console.log('plugins load finish\n');
 }
@@ -100,9 +104,8 @@ function init(config_path: string) {
 			config_path,
 			JSON.stringify(
 				{
-					sources_folder: './sources',
-					plugins_folder: './plugins',
-					scripts_folder: './scripts',
+					sources: ['./sources/**/*.md'],
+					plugins: ['./plugins/**/*.js'],
 					output_folder: './dist',
 					ignore_sources: ['./sources/**/*.ignore.md'],
 					ignore_plugins: ['./plugins/**/*.ignore.js'],
@@ -110,26 +113,34 @@ function init(config_path: string) {
 					styles: ['./style.css'],
 					readme: './README.md',
 					readme_mount: 'body',
-					markdown_it_config: {}
+					markdown_it_config: {
+						html: true,
+						xhtmlOut: false,
+						breaks: true,
+						langPrefix: 'language-',
+						linkify: false,
+						typographer: true,
+						quotes: '“”‘’'
+					}
 				} as Config,
 				null,
 				4
 			)
 		);
 		console.log(chalk.greenBright('generated: [file] ' + config_path));
+
+		// 初始化文件夹
+		['./sources', './plugins', './dist'].forEach((folder) => {
+			const target = resolve(process.cwd(), folder);
+			if (fs.existsSync(target) === false) {
+				changes = true;
+				fs.mkdirSync(target, { recursive: true });
+				console.log(chalk.greenBright('generated: [folder] ' + folder));
+			}
+		});
 	}
 
 	const cfg: Config = JSON.parse(fs.readFileSync(config_path).toString());
-
-	// 初始化文件夹
-	[cfg.plugins_folder, cfg.sources_folder, cfg.scripts_folder, cfg.output_folder].forEach((folder) => {
-		const target = resolve(process.cwd(), folder);
-		if (fs.existsSync(target) === false) {
-			changes = true;
-			fs.mkdirSync(target, { recursive: true });
-			console.log(chalk.greenBright('generated: [folder] ' + folder));
-		}
-	});
 
 	// 将当前的默认样式文件和模版文件导入
 

@@ -17,14 +17,14 @@ function createMarkdownItInstance() {
 				xhtmlOut: false,
 				breaks: true,
 				langPrefix: 'language-',
-				linkify: true,
+				linkify: false,
 				typographer: true,
 				quotes: '“”‘’',
 				highlight: function (str, lang) {
 					if (lang && hljs.getLanguage(lang)) {
 						try {
 							return (
-								'<pre class="hljs"><code>' +
+								'<pre class="hljs custom"><code>' +
 								hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
 								'</code></pre>'
 							);
@@ -66,7 +66,7 @@ export function renderMarkdownTo(file_info: FileInfo) {
 				`file: ${file_info.filename}`,
 				`template: ${defined_template}`
 			);
-			return false;
+			return;
 		}
 		template = fs.readFileSync(resolve(process.cwd(), defined_template)).toString('utf-8');
 	} else {
@@ -104,6 +104,10 @@ export function renderMarkdownTo(file_info: FileInfo) {
 	if (fs.existsSync(dirname(file_info.dest)) === false) {
 		fs.mkdirSync(dirname(file_info.dest), { recursive: true });
 	}
-	fs.writeFileSync(file_info.dest, dom.serialize());
-	return true;
+
+	const rendered_html = dom.serialize();
+
+	fs.writeFileSync(file_info.dest, rendered_html);
+
+	return Object.assign(file_info, { rendered_html: rendered_html });
 }

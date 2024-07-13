@@ -1,7 +1,7 @@
 import chokidar from 'chokidar';
 import chalk from 'chalk';
 import { resolve, join } from 'path';
-import { Config } from '.';
+import { Config } from './cmd';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext, parseMarkdownContext, printBuildInfo } from './utils';
 import { renderMarkdownTo } from './core/markdown';
@@ -43,7 +43,7 @@ export function watch(cfg: Config) {
 		});
 	});
 
-	chokidar.watch(join(cfg.sources_folder, '**/*.md'), { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
+	chokidar.watch(cfg.sources, { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
 		if (building === true) {
 			return;
 		}

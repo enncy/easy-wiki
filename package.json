@@ -2,8 +2,8 @@
 	"name": "ewiki",
 	"version": "0.0.16",
 	"description": "easy-wiki",
-	"main": "./lib/index.js",
-	"types": "./lib/index.d.ts",
+	"main": "./lib/cmd.js",
+	"types": "./lib/interface.d.ts",
 	"files": [
 		"./lib",
 		"./assets",
@@ -14,7 +14,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"bin": {
-		"ewiki": "./lib/index.js"
+		"ewiki": "./lib/cmd.js"
 	},
 	"repository": {
 		"type": "git",

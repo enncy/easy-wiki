@@ -5,13 +5,11 @@ import chalk from 'chalk';
 import { resolve } from 'path';
 import fs from 'fs';
 
-const script_caches: Record<string, string> = {};
-const script_errored: Record<string, string> = {};
-
 const style_caches: Record<string, string> = {};
 const style_errored: Record<string, string> = {};
 
 export default class InfoWriterPlugin implements Plugin {
+	priority = -1;
 	onHtmlFileRender(filepath: string, dest: string, ctx: MarkdownContext, window: DOMWindow) {
 		const info = getFileInfo(filepath, ctx);
 		const document = window.document;
@@ -21,49 +19,34 @@ export default class InfoWriterPlugin implements Plugin {
 		// 不暴露文件路径
 		info.filepath = info.filepath.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
 		info.dest = info.dest.replace(resolve(process.cwd()), '').replace(/\\/g, '/');
-		script.innerHTML = `window.__ewiki_info__ = ${JSON.stringify(info)};`;
+		script.innerHTML = `window.__ewiki_info__ = JSON.parse(decodeURIComponent("${encodeURIComponent(
+			JSON.stringify(info)
+		)}"));`;
 		document.head.append(script);
-		// 添加脚本文件
 
-		[...(ctx.metadata.scripts?.split(',') || [])].forEach((script) => {
-			if (script_errored[script]) {
-				return;
-			}
+		// 修改 meta 标签
+		const meta_desc = document.querySelector('meta[name="description"]');
+		if (meta_desc) {
+			meta_desc.setAttribute('content', ctx.metadata.description || '');
+		} else {
+			const meta = document.createElement('meta');
+			meta.name = 'description';
+			meta.content = ctx.metadata.description || '';
+			document.head.append(meta);
+		}
 
-			if (script.startsWith('http') || script.startsWith('https')) {
-				const script_tag = document.createElement('script');
-				script_tag.src = script;
-				document.body.append(script_tag);
-			} else if (script.startsWith('<script')) {
-				const script_tag = document.createElement('script');
-				script_tag.innerHTML = script;
-				document.body.append(script_tag);
-			} else if (script.endsWith('.js')) {
-				let script_content = '';
-				if (script_caches[script]) {
-					script_content = script_caches[script];
-				} else {
-					if (fs.existsSync(script)) {
-						script_content = fs.readFileSync(script).toString('utf-8').replace(/\n/g, '');
-						script_caches[script] = script_content;
-					} else {
-						script_errored[script] = 'true';
-						console.error(
-							`${chalk.redBright('[info-writer]')} error in (${filepath}) : script file not found: ${script}`
-						);
-						return;
-					}
-				}
-				const script_tag = document.createElement('script');
-				script_tag.innerHTML = script_content;
-				document.body.append(script_tag);
-			} else {
-				script_errored[script] = 'true';
-				console.error(
-					`${chalk.redBright('[info-writer]')} error in (${filepath}) : script file not support: ${script}`
-				);
-			}
-		});
+		const meta_keywords = document.querySelector('meta[name="keywords"]');
+		if (meta_keywords) {
+			meta_keywords.setAttribute('content', ctx.metadata.keywords || '');
+		} else {
+			const meta = document.createElement('meta');
+			meta.name = 'keywords';
+			meta.content = ctx.metadata.keywords || '';
+			document.head.append(meta);
+		}
+
+		// 修改 title
+		document.title = ctx.metadata.title || document.title;
 
 		// 添加样式文件
 		[...EWiki.config.styles, ...(ctx.metadata.styles?.split(',') || [])].forEach((style) => {

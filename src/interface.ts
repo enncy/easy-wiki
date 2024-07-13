@@ -2,7 +2,7 @@ import jsdom from 'jsdom';
 import { DOMWindow } from 'jsdom';
 import type MarkdownIt from 'markdown-it';
 import { getFileInfo } from './utils';
-import { Config } from '.';
+import { Config } from './cmd';
 
 declare global {
 	var EWiki: {
@@ -44,7 +44,7 @@ export type Plugin = {
 	 */
 	onHtmlFileRender?: (filepath: string, dest: string, ctx: MarkdownContext, window: DOMWindow) => void;
 	/** 当使用 build 命令完成全部渲染时调用 */
-	onRenderFinish?: (file_info: FileInfo[]) => void;
+	onRenderFinish?: (file_info: (FileInfo & { rendered_html: string })[]) => void;
 };
 
 export type FileInfo = ReturnType<typeof getFileInfo>;

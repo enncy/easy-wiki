@@ -1,6 +1,6 @@
-import { Config } from '.';
+import { Config } from './cmd';
 import { renderMarkdownTo } from './core/markdown';
-import { basename, dirname, join, resolve } from 'path';
+import { resolve } from 'path';
 import { glob } from 'glob';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext, printBuildInfo } from './utils';
@@ -13,10 +13,10 @@ export async function buildReadme(cfg: Config) {
 		const ctx = getMarkdownContext(content, true);
 		const info = getFileInfo(readme, ctx, content);
 		info.dest = resolve('./index.html');
-		info.markdown_context.metadata.mount = info.markdown_context.metadata.mount || cfg.readme_mount;
-		if (renderMarkdownTo(info)) {
+		const res = renderMarkdownTo(info);
+		if (res) {
 			console.log('[easy-wiki builder] readme build finish!');
-			return info;
+			return res;
 		}
 	} else {
 		console.log('[easy-wiki builder] ' + chalk.yellowBright('readme not found'));
@@ -29,25 +29,29 @@ export async function buildAll(cfg: Config) {
 		readme_info = await buildReadme(cfg);
 	}
 
-	let infos = await createFileInfos(cfg);
+	const infos = await createFileInfos(cfg);
+
+	const rendered_infos = [];
 
 	for (const info of infos) {
-		if (renderMarkdownTo(info)) {
+		const res = renderMarkdownTo(info);
+		if (res && res.rendered_html) {
+			rendered_infos.push(res);
 			printBuildInfo(info);
 		}
 	}
 
 	if (readme_info) {
-		infos = [readme_info, ...infos];
+		rendered_infos.push(readme_info);
 	}
 
 	for (const plugin of EWiki.plugins) {
-		plugin.onRenderFinish?.(infos);
+		plugin.onRenderFinish?.(rendered_infos);
 	}
 }
 
 export async function createFileInfos(cfg: Config) {
-	const files = await glob(resolve(cfg.sources_folder, '**/*.md').replace(/\\/g, '/'), { ignore: cfg.ignore_sources });
+	const files = await glob(cfg.sources, { ignore: cfg.ignore_sources });
 	const infos = files.map((file) => {
 		const file_content = fs.readFileSync(file).toString('utf-8');
 		return getFileInfo(resolve(file), getMarkdownContext(file_content, false), file_content);

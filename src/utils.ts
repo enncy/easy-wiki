@@ -1,12 +1,12 @@
 import { basename, dirname, join, resolve } from 'path';
 import { FileInfo, MarkdownContext } from './interface';
 import fs from 'fs';
-import { Config } from '.';
 import chalk from 'chalk';
 
 export function getMarkdownContext(content: string, is_readme_file: boolean) {
-	const [_, info, _content] = content.match(/------ewiki-config------([\s\S]+)------ewiki-config------([\s\S]*)/) || [];
-
+	const reg = /^-{2,}ewiki-config-{2,}\s([\s\S]+?)\s-{2,}ewiki-config-{2,}/;
+	const [_, info] = content.match(reg) || [];
+	const _content = content.replace(reg, '');
 	const lines =
 		(info ? String(info) : '')
 			.split('\n')
@@ -23,17 +23,18 @@ export function getMarkdownContext(content: string, is_readme_file: boolean) {
 
 export function parseMarkdownContext(ctx: MarkdownContext) {
 	return [
-		'------ewiki-config------',
+		'---ewiki-config---',
 		...Object.entries(ctx.metadata).map(([key, value]) => `${key}=${value}`),
-		'------ewiki-config------' + ctx.content
+		'---ewiki-config---' + ctx.content
 	].join('\n');
 }
 
 export function getFileInfo(filepath: string, ctx: MarkdownContext, file_content?: string) {
 	const stat = fs.statSync(filepath);
-	const dir = join(dirname(filepath).replace(process.cwd(), '').replace(/\\/g, '/'));
+	const dir = join(dirname(filepath).replace(process.cwd(), '')).replace(/\\/g, '/');
 	const filename = basename(filepath);
 	const content = file_content ?? fs.readFileSync(filepath).toString('utf-8');
+
 	return {
 		dirname: dir,
 		filename: filename,

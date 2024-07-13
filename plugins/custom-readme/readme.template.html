@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0"
+		/>
+		<title>easy-wiki doc</title>
+	</head>
+	<body>
+		<div class="header">
+			<div class="wrapper">
+				<div class="container">
+					<div class="sidebar-trigger-wrapper">
+						<div class="sidebar-trigger">目录 ≡</div>
+					</div>
+
+					<div class="search">
+						<span
+							class="search-results"
+							tabindex="1"
+						></span>
+						<input
+							placeholder="搜索文章"
+							id="search-input"
+						/>
+						<button id="search-btn">搜索</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="content">
+			<div class="wrapper">
+				<div class="container">
+					<div class="sidebar-wrapper">
+						<div>目录内容</div>
+						<hr />
+						<div class="sidebar"></div>
+					</div>
+					<div class="markdown-wrapper">
+						<div class="markdown-body"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			window.addEventListener('load', () => {
+				document.querySelector('.sidebar-trigger').addEventListener('click', () => {
+					document.querySelector('.sidebar-wrapper').classList.toggle('active');
+				});
+
+				document.querySelector('.search-results')?.addEventListener('blur', (e) => {
+					// 设置延迟否则无法点击链接
+					setTimeout(() => {
+						document.querySelector('.search-results').style.display = 'none';
+					}, 200);
+				});
+
+				document.querySelector('#search-btn').addEventListener('click', () => {
+					document.querySelector('#search-input').value = document.querySelector('#search-input').value.trim();
+					const searchInput = document.querySelector('#search-input');
+					const results = document.querySelector('.search-results');
+
+					results.style.display = 'block';
+					results.innerHTML = '';
+					results.focus();
+
+					const readme_info = (__ewiki_files_info__ || []).find(
+						(info) => info.markdown_context.is_readme_file === true
+					);
+
+					let has_searched = false;
+
+					for (const info of __ewiki_files_info__ || []) {
+						/** @type {string} */
+						const content = (new DOMParser().parseFromString(info.text || '', 'text/html').body.textContent || '')
+							.replace(/\n/g, '')
+							.replace(/ +/g, ' ');
+						/** @type {string} */
+						const keyword = searchInput.value;
+						const index = content.indexOf(keyword);
+						if (index !== -1) {
+							has_searched = true;
+							const part1 = content.slice(0, index);
+							const part2 = content.slice(index + keyword.length, content.length);
+							const div = document.createElement('div');
+							const span = document.createElement('span');
+							span.innerHTML = part1.slice(0, 20) + `<mark>${keyword}</mark>` + part2.slice(0, 20) + '...';
+							const a = document.createElement('a');
+							a.href = `${readme_info.markdown_context.metadata.sidebar_url_base}/${info.dest}`;
+							a.innerText = info.filename;
+
+							div.appendChild(a);
+							div.appendChild(span);
+							results.appendChild(div);
+						}
+					}
+
+					if (has_searched === false) {
+						results.innerHTML = '没有找到相关文章';
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
