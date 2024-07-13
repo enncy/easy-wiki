@@ -1,7 +1,7 @@
 ---ewiki-config---
 mount=.markdown-body
 create_at=2024/7/12 18:54:27
-update_at=2024/7/13 22:36:50
+update_at=2024/7/13 22:52:01
 sidebar_url_base=https://enncy.github.io/easy-wiki/
 sidebar=首页
 title=EWiki Docs
@@ -15,8 +15,13 @@ title=EWiki Docs
 **安装**
 
 ```sh
-npm install ewiki
+npm install ewiki -g
 ```
+
+::: 注意
+如果是安装到当前目录，则需要使用 `npx ewiki` 命令
+只有添加 `-g` 选项安装到全局才可以使用 单个的 `ewiki` 命令
+::: 
 
 **命令**
   
