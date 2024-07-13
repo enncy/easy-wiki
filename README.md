@@ -1,7 +1,7 @@
 ---ewiki-config---
 mount=.markdown-body
 create_at=2024/7/12 18:54:27
-update_at=2024/7/13 23:11:53
+update_at=2024/7/13 23:14:25
 sidebar_url_base=https://enncy.github.io/easy-wiki/
 sidebar=首页
 title=EWiki Docs
@@ -11,7 +11,7 @@ title=EWiki Docs
 # easy-wiki docs
 
 ::: info
-项目地址：https://github.com/enncy/easy-wiki
+项目地址：[https://github.com/enncy/easy-wiki](https://github.com/enncy/easy-wiki)
 :::
 
 > 极致简单的 wiki 搭建工具
