@@ -25,7 +25,7 @@ export function parseMarkdownContext(ctx: MarkdownContext) {
 	return [
 		'---ewiki-config---',
 		...Object.entries(ctx.metadata).map(([key, value]) => `${key}=${value}`),
-		'---ewiki-config---' + ctx.content
+		'---ewiki-config---' + (ctx.content.startsWith('\n') ? ctx.content : '\n' + ctx.content)
 	].join('\n');
 }
 
