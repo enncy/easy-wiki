@@ -89,7 +89,7 @@ function buildFile(
         const a = document.createElement('a')
         const name = readme_info.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
         a.textContent = name
-        a.setAttribute('href', join(readme_info.markdown_context.metadata.sidebar_url_base || '', readme_info.dest.replace(process.cwd(), '').replace(/\\/g, '/')))
+        a.setAttribute('href', (readme_info.markdown_context.metadata.sidebar_url_base || '') + join(readme_info.dest.replace(process.cwd(), '')).replace(/\\/g, '/'))
         sidebar.append(a)
 
         // 生成各级别父元素
@@ -132,7 +132,7 @@ function buildFile(
             if (source.markdown_context.metadata.sidebar != undefined) {
                 const name = source.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                 a.textContent = name
-                const href = join(readme_info.markdown_context.metadata.sidebar_url_base || '', source.dest.replace(process.cwd(), '').replace(/\\/g, '/'))
+                const href = (readme_info.markdown_context.metadata.sidebar_url_base || '') + join(source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
                 a.setAttribute('href', href)
                 if (folder) {
                     folder.appendChild(a)
