@@ -25,6 +25,8 @@ exports.default = {
     },
     onRenderFinish(infos) {
         const sources = infos.filter(info => info.markdown_context.is_readme_file === false)
+            // 根据文件名排序
+            .sort((a, b) => a.filepath.localeCompare(b.filepath))
         let readme_info
         for (const info of infos) {
             if (info.markdown_context.is_readme_file) {
