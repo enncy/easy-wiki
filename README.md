@@ -1,8 +1,8 @@
 ---ewiki-config---
 mount=.markdown-body
 create_at=2024/7/12 18:54:27
-update_at=2024/7/13 21:58:45
-sidebar_url_base=file:///A:/VSCode/code/easy-wiki-pages/
+update_at=2024/7/13 22:09:00
+sidebar_url_base=https://enncy.github.io/easy-wiki/
 sidebar=首页
 title=EWiki Docs
 ---ewiki-config---
