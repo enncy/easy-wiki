@@ -1,19 +1,12 @@
 {
-    "sources_folder": "./sources",
-    "plugins_folder": "./node_modules/ewiki/plugins",
-    "scripts_folder": "./scripts",
-    "output_folder": "./dist",
-    "ignore_sources": [
-        "./sources/**/*.ignore.md"
-    ],
-    "ignore_plugins": [
-        "./plugins/**/*.ignore.js"
-    ],
-    "html_template": "./node_modules/ewiki/plugins/readme-sidebar/readme.template.html",
-    "styles": [
-        "./style.css"
-    ],
-    "readme": "./README.md",
-    "readme_mount": ".markdown-body",
-    "markdown_it_config": {}
+  "sources": ["./文章列表/**/*.md"],
+  "plugins": ["./plugins/**/*.js", "./node_modules/ewiki/plugins/**/*.js"],
+  "output_folder": "./dist",
+  "ignore_sources": ["./文章列表/**/*.ignore.md"],
+  "ignore_plugins": ["./plugins/**/*.ignore.js"],
+  "html_template": "./node_modules/ewiki/plugins/custom-readme/readme.template.html",
+  "styles": ["./style.css", "./node_modules/ewiki/plugins/custom-readme/style.css"],
+  "readme": "./README.md",
+  "readme_mount": ".markdown-body",
+  "markdown_it_config": {}
 }
