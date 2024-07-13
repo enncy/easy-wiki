@@ -5,6 +5,8 @@ const fs = require('fs');
 const child_process = require('child_process');
 const { join, resolve } = require('path');
 
+const style_content = fs.readFileSync(resolve(__dirname, './style.css')).toString('utf-8');
+
 /** @type {import('../../lib/interface.d.ts').Plugin} */
 exports.default = {
     // 最后执行
@@ -82,6 +84,10 @@ function buildFile(
         if (!sidebar) {
             return
         }
+        // 添加样式
+        const style = document.createElement('style')
+        style.textContent = style_content
+        document.head.append(style)
 
 
         // 添加首页链接
