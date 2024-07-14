@@ -5,7 +5,7 @@ import { buildAll } from './build';
 import { watch } from './watch';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import TimeWriterPlugin from './default-plugins/time_writer';
 import InfoWriterPlugin from './default-plugins/info_writer';
 
@@ -24,8 +24,7 @@ export interface Config {
 	ignore_plugins: string[];
 	styles: string[];
 	html_template: string;
-	readme: string;
-	readme_mount: string;
+	markdown_mount: string;
 	markdown_it_config: Record<string, any>;
 }
 
@@ -75,13 +74,32 @@ async function loadPlugins(config: Config) {
 		ignore: config.ignore_plugins
 	});
 
+	// 尝试寻找NodeModules下的插件文件
+	const node_modules_files = await glob(filterNodeModulesPlugins());
+	files.push(...node_modules_files);
+
 	for (const file of files) {
-		console.log(chalk.blueBright('load plugin') + ' : ' + file);
-		const plu = require(resolve(file)).default;
-		if (typeof plu === 'function') {
-			EWiki.plugins.push(new plu());
-		} else {
-			EWiki.plugins.push(plu);
+		try {
+			const plu = require(resolve(file)).default;
+			let instance = plu;
+			if (typeof instance === 'function') {
+				instance = new plu();
+			}
+			if (
+				instance &&
+				(Reflect.has(instance, 'onMarkdownItInit') ||
+					Reflect.has(instance, 'onMarkdownChange') ||
+					Reflect.has(instance, 'onHtmlFileRender') ||
+					Reflect.has(instance, 'onRenderFinish'))
+			) {
+				EWiki.plugins.push(instance);
+				console.log(chalk.greenBright('plugin load success') + ' : ' + file);
+			} else {
+				console.log(chalk.redBright('plugin not valid') + ' : ' + file);
+			}
+		} catch (e) {
+			console.log(chalk.redBright('plugin load failed') + ' : ' + file);
+			console.error(e);
 		}
 	}
 
@@ -90,7 +108,7 @@ async function loadPlugins(config: Config) {
 		return (a.priority || 0) - (b.priority || 0);
 	});
 
-	console.log('plugins load finish\n');
+	console.log(chalk.blueBright('plugins load finish\n'));
 }
 
 function init(config_path: string) {
@@ -104,15 +122,14 @@ function init(config_path: string) {
 			config_path,
 			JSON.stringify(
 				{
-					sources: ['./sources/**/*.md'],
+					sources: ['./**/*.md'],
 					plugins: ['./plugins/**/*.js'],
 					output_folder: './dist',
-					ignore_sources: ['./sources/**/*.ignore.md'],
-					ignore_plugins: ['./plugins/**/*.ignore.js'],
+					ignore_sources: ['./**/*.ignore.md', './node_modules/**/*.md'],
+					ignore_plugins: ['./**/*.ignore.js', './node_modules/**/*.js'],
 					html_template: './template.html',
 					styles: ['./style.css'],
-					readme: './README.md',
-					readme_mount: 'body',
+					markdown_mount: '.markdown-body',
 					markdown_it_config: {
 						html: true,
 						xhtmlOut: false,
@@ -146,8 +163,7 @@ function init(config_path: string) {
 
 	const template_path = resolve(process.cwd(), cfg.html_template);
 	const style_path = resolve(process.cwd(), cfg.styles[0]);
-	const readme_path = resolve(process.cwd(), cfg.readme);
-	const type_path = resolve(process.cwd(), './env.d.ts');
+	const index_md_path = resolve(process.cwd(), './index.md');
 
 	if (fs.existsSync(template_path) === false) {
 		changes = true;
@@ -159,20 +175,37 @@ function init(config_path: string) {
 		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), style_path);
 		console.log(chalk.greenBright('generated: [file] ' + cfg.styles[0]));
 	}
-	if (fs.existsSync(readme_path) === false) {
+	if (fs.existsSync(index_md_path) === false) {
 		changes = true;
-		fs.writeFileSync(readme_path, '# Hello World');
-		console.log(chalk.greenBright('generated: [file] ' + cfg.readme));
-	}
-
-	// 类型文件
-	if (fs.existsSync(type_path) === false) {
-		changes = true;
-		fs.copyFileSync(resolve(__dirname, '../lib/interface.d.ts'), type_path);
-		console.log(chalk.greenBright('generated: [file] env.d.ts'));
+		fs.writeFileSync(index_md_path, 'hello world');
+		console.log(chalk.greenBright('generated: [file] ./index.md'));
 	}
 
 	if (changes === false) {
 		console.log(chalk.greenBright('nothing changes'));
 	}
+}
+
+/**
+ *  尝试寻找NodeModules下的插件文件
+ */
+function filterNodeModulesPlugins() {
+	const valid_plugins = [];
+	for (const plugin_glob of EWiki.config.plugins) {
+		if (plugin_glob.includes('/') === false && plugin_glob.endsWith('.js') === false) {
+			const possible_paths = [join(process.cwd(), 'node_modules', plugin_glob, 'plugins')];
+			let handled = false;
+			for (const pos of possible_paths) {
+				if (fs.existsSync(pos)) {
+					valid_plugins.push(pos + '/**/*.js');
+					handled = true;
+					break;
+				}
+			}
+			if (handled === false) {
+				console.log(chalk.redBright('plugin file not found: ' + plugin_glob));
+			}
+		}
+	}
+	return valid_plugins;
 }

@@ -3,7 +3,7 @@ import { FileInfo, MarkdownContext } from './interface';
 import fs from 'fs';
 import chalk from 'chalk';
 
-export function getMarkdownContext(content: string, is_readme_file: boolean) {
+export function getMarkdownContext(content: string) {
 	const reg = /^-{2,}ewiki-config-{2,}\s([\s\S]+?)\s-{2,}ewiki-config-{2,}/;
 	const [_, info] = content.match(reg) || [];
 	const _content = content.replace(reg, '');
@@ -18,7 +18,7 @@ export function getMarkdownContext(content: string, is_readme_file: boolean) {
 		const [key, value] = line.split('=');
 		metadata[key] = value;
 	}
-	return { metadata, content: _content || content, is_readme_file };
+	return { metadata, content: _content || content };
 }
 
 export function parseMarkdownContext(ctx: MarkdownContext) {
@@ -50,8 +50,8 @@ export function getFileInfo(filepath: string, ctx: MarkdownContext, file_content
 export function printBuildInfo(info: FileInfo) {
 	console.log(
 		chalk.blueBright(`[easy-wiki builder] ${new Date().toLocaleTimeString()} build-finish: `) +
-			info.filepath.split('\\').slice(-2).join('/') +
+			info.filepath.replace(process.cwd(), '').replace(/\\/g, '/') +
 			' -> ' +
-			info.dest.split('\\').slice(-2).join('/')
+			info.dest.replace(process.cwd(), '').replace(/\\/g, '/')
 	);
 }

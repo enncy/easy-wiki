@@ -8,7 +8,7 @@ import { Config } from './cmd';
 declare global {
 	var EWiki: {
 		/** 配置文件 */
-		config: Config;
+		config: Config & Record<string, any | undefined>;
 		/** 全部已加载插件列表 */
 		plugins: Plugin[];
 		/** 模拟浏览器模块对象，文档：https://www.npmjs.com/package/jsdom  */
@@ -31,9 +31,7 @@ export interface MarkdownContext {
 		scripts?: string;
 		/** 指定的样式文件，如果没有则使用配置中默认样式 */
 		styles?: string;
-	} & Record<string, string>;
-	/** 标记当前文件是否为 readme 首页文件 */
-	is_readme_file: boolean;
+	} & Record<string, string | undefined>;
 }
 
 export type Plugin = {

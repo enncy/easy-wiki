@@ -7,29 +7,7 @@ import { getFileInfo, getMarkdownContext, printBuildInfo } from './utils';
 import chalk from 'chalk';
 import { FileInfo } from './interface';
 
-export async function buildReadme(cfg: Config) {
-	if (fs.existsSync(cfg.readme)) {
-		const readme = resolve(cfg.readme);
-		const content = fs.readFileSync(readme).toString('utf-8');
-		const ctx = getMarkdownContext(content, true);
-		const info = getFileInfo(readme, ctx, content);
-		info.dest = resolve('./index.html');
-		const res = renderMarkdownTo(info);
-		if (res) {
-			console.log('[easy-wiki builder] readme build finish!');
-			return res;
-		}
-	} else {
-		console.log('[easy-wiki builder] ' + chalk.yellowBright('readme not found'));
-	}
-}
-
 export async function buildAll(cfg: Config) {
-	let readme_info;
-	if (cfg.readme) {
-		readme_info = await buildReadme(cfg);
-	}
-
 	const infos = await createFileInfos(cfg);
 
 	const rendered_infos = [];
@@ -40,10 +18,6 @@ export async function buildAll(cfg: Config) {
 			rendered_infos.push(res);
 			printBuildInfo(info);
 		}
-	}
-
-	if (readme_info) {
-		rendered_infos.push(readme_info);
 	}
 
 	for (const plugin of EWiki.plugins) {
@@ -60,7 +34,7 @@ export async function createFileInfos(cfg: Config) {
 					if (err) {
 						return console.log('[easy-wiki builder] ' + chalk.redBright('error') + ' : ' + err);
 					}
-					resolve_promise(getFileInfo(resolve(file), getMarkdownContext(file_content, false), file_content));
+					resolve_promise(getFileInfo(resolve(file), getMarkdownContext(file_content), file_content));
 				});
 			});
 		})

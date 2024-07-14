@@ -5,7 +5,6 @@ import { Config } from './cmd';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext, parseMarkdownContext, printBuildInfo } from './utils';
 import { renderMarkdownTo } from './core/markdown';
-import { buildReadme } from './build';
 
 export function watch(cfg: Config) {
 	console.log(chalk.blueBright('\n\n[easy-wiki]:'), 'watcher running!');
@@ -16,50 +15,23 @@ export function watch(cfg: Config) {
 
 	let building = false;
 
-	chokidar.watch(cfg.readme).on('change', () => {
-		if (building === true) {
-			return;
-		}
-		building = true;
-		buildReadme(cfg).then((info) => {
-			if (!!info === false) {
-				return;
-			}
-			const ctx = info.markdown_context;
-			let origin_content = ctx.content;
-			let origin_metadata = JSON.parse(JSON.stringify(ctx.metadata));
-			for (const plugin of EWiki.plugins) {
-				plugin.onMarkdownChange?.(info.filepath, ctx);
-				if (origin_content !== ctx.content || JSON.stringify(origin_metadata) !== JSON.stringify(ctx.metadata)) {
-					origin_content = ctx.content;
-					origin_metadata = ctx.metadata;
-					fs.writeFileSync(resolve(cfg.readme), parseMarkdownContext(ctx));
-				}
-			}
-
-			setTimeout(() => {
-				building = false;
-			}, 100);
-		});
-	});
-
 	chokidar.watch(cfg.sources, { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
 		if (building === true) {
 			return;
 		}
 		if (stats?.isFile()) {
 			building = true;
-			onChange(path, false);
+			onChange(path);
 			setTimeout(() => {
 				building = false;
 			}, 100);
 		}
 	});
 
-	const onChange = (path: string, is_readme_file: boolean) => {
+	const onChange = (path: string) => {
 		const file_content = fs.readFileSync(path).toString('utf-8');
 		/** 解析 markdown 上下文 */
-		const ctx = getMarkdownContext(file_content, is_readme_file);
+		const ctx = getMarkdownContext(file_content);
 		/** 获取文件信息 */
 		const info = getFileInfo(resolve(path), ctx, file_content);
 		/** 解析文件 */

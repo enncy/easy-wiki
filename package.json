@@ -11,7 +11,7 @@
 		"./env.d.ts"
 	],
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"pub:patch": "tsc && npm version patch && npm publish"
 	},
 	"bin": {
 		"ewiki": "./lib/cmd.js"
