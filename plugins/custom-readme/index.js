@@ -97,17 +97,18 @@ function buildFile(
         }
 
 
-
         // 添加底部组件 
         const footer_el = document.querySelector('.footer')
         const footer_template = EWiki.config?.["custom-readme-plugin"]?.["footer-template"] || ''
         if (footer_template) {
             if (footer_el) {
                 let content = fs.readFileSync(footer_template, { encoding: 'utf-8' }).toString()
-                const metadata = readme_info.markdown_context.metadata
+                const metadata = file_info.markdown_context.metadata
                 for (const key in metadata) {
                     if (Object.hasOwnProperty.call(metadata, key)) {
-                        content = content.replace(new RegExp(`{{METADATA.${key}}}`, 'g'), metadata[key])
+                        if (metadata[key]) {
+                            content = content.replace(new RegExp(`{{METADATA.${key}}}`, 'g'), metadata[key])
+                        }
                     }
                 }
                 footer_el.innerHTML = content
@@ -143,7 +144,9 @@ function buildFile(
 
 
         // 添加首页链接
-        const sidebar_url_base = readme_info.markdown_context.metadata.sidebar_url_base.endsWith('/') ? readme_info.markdown_context.metadata.sidebar_url_base.slice(0, -1) : readme_info.markdown_context.metadata.sidebar_url_base
+        const sidebar_url_base =
+            readme_info.markdown_context.metadata.sidebar_url_base === undefined ? '' :
+                readme_info.markdown_context.metadata.sidebar_url_base.endsWith('/') ? readme_info.markdown_context.metadata.sidebar_url_base.slice(0, -1) : readme_info.markdown_context.metadata.sidebar_url_base
 
         const parts = getFilepathParts(readme_info.filepath)
         const a = document.createElement('a')
