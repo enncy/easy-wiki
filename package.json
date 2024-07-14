@@ -3,7 +3,7 @@
     "deploy": "npx ewiki && git add . && git commit -m 'deploy' && git push origin"
   },
   "devDependencies": {
-    "ewiki": "^0.0.29"
+    "ewiki": "^0.0.31"
   },
   "dependencies": {
     "markdown-it-container": "^4.0.0"
