@@ -8,11 +8,6 @@ html {
 	background-color: #f3f3f3 !important;
 }
 
-hr {
-	margin-top: 12px !important;
-	margin-bottom: 12px !important;
-}
-
 .header {
 	height: 48px;
 	width: 100%;
@@ -30,6 +25,17 @@ hr {
 	padding: 4px 12px !important;
 	border-bottom: 1px solid #dadada;
 	align-items: center;
+}
+
+.header .extra {
+	display: flex;
+	justify-content: end;
+	flex: auto;
+	align-items: center;
+	padding: 0px 12px;
+}
+.header .extra a + a {
+	margin-left: 12px;
 }
 
 .wrapper {
@@ -55,9 +61,23 @@ hr {
 
 .sidebar-wrapper {
 	flex: 0 180px;
-	padding-left: 24px;
+	padding: 0px 24px;
 	margin-top: 12px;
 	border-right: 1px solid #dadada;
+}
+
+.sidebar-wrapper hr {
+	margin-top: 4px !important;
+	margin-bottom: 4px !important;
+	border-top: 1px solid #dadada !important;
+}
+
+.sidebar-wrapper .links-group {
+	margin-bottom: 12px;
+}
+
+.sidebar-wrapper .links-group a {
+	font-weight: bold;
 }
 
 .sidebar-trigger {
@@ -75,9 +95,28 @@ hr {
 }
 
 .sidebar-trigger-wrapper {
+	flex: 0 74px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.sidebar {
+	margin-top: 12px;
+	text-wrap: nowrap;
+	overflow: auto;
+	min-width: 200px;
+	max-width: 400px;
+	top: 12px;
+	position: sticky;
+}
+
+.sidebar > a {
+	font-weight: bold;
+}
+
+.search {
+	flex: 0 240px;
 }
 
 .search-results {
@@ -105,20 +144,14 @@ hr {
 }
 
 .markdown-wrapper {
-	flex: 0 auto;
+	flex: auto;
+	margin-bottom: 64px;
 	padding: 0px 24px;
-	padding-bottom: 128px;
 	width: 100%;
 }
 
-.sidebar {
-	margin-top: 12px;
-	text-wrap: nowrap;
-	overflow: auto;
-	min-width: 200px;
-	max-width: 400px;
-	top: 12px;
-	position: sticky;
+.markdown-body {
+	margin-bottom: 64px;
 }
 
 .sidebar details {
