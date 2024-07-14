@@ -17,6 +17,23 @@ const el = (document, tag, html) => {
 /** @type {import('../../lib/interface.d.ts').Plugin} */
 exports.default = {
     onMarkdownItInit(md) {
+        // 添加自定义样式
+        md.core.ruler.push('custom-rule', function (state) {
+            const tokens = state.tokens
+            function handle(tokens) {
+                for (const token of tokens) {
+                    addClass(token, 'table', ['table-striped', 'custom'])
+                    addClass(token, 'pre', ['custom'])
+                    addClass(token, 'blockquote', ['custom'])
+                    if (token.children?.length) {
+                        handle(token.children)
+                    }
+                }
+            }
+            handle(tokens)
+        })
+
+
         // https://www.npmjs.com/package/markdown-it-container
         // @ts-ignore
         customContainer(md, 'success')
@@ -30,6 +47,12 @@ exports.default = {
     // @ts-ignore
     onHtmlFileRender(filepath, dest, ctx, { document }) {
         document.head.append(el(document, 'style', style));
+    }
+}
+
+function addClass(token, tag_name, list) {
+    if (token.tag === tag_name) {
+        token.attrSet('class', list.join(' '))
     }
 }
 

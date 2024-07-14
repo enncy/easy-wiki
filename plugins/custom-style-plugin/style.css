@@ -1,3 +1,20 @@
 img {
 	max-width: 100%;
 }
+
+pre.custom {
+	background: #f8f8f8;
+}
+
+h1,
+h2 {
+	border-bottom: 2px solid #cecece;
+	padding-bottom: 4px;
+	margin-bottom: 12px;
+	font-family: 'Linux Libertine', 'Georgia', 'Times', 'Source Serif Pro', serif !important;
+}
+
+mark {
+	background-color: #f5e838 !important;
+	color: #000;
+}

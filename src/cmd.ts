@@ -33,7 +33,11 @@ const program = new Command();
 program
 	.command('init')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
-	.action((args) => init(args.config));
+	.action((args) => {
+		if (init(args.config) === false) {
+			console.log(chalk.greenBright('nothing to do'));
+		}
+	});
 
 // 直接设置为默认命令
 program
@@ -41,7 +45,6 @@ program
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
-			console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
 			init(args.config);
 		}
 
@@ -57,7 +60,6 @@ program
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
-			console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
 			init(args.config);
 		}
 		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
@@ -116,7 +118,7 @@ function init(config_path: string) {
 
 	if (fs.existsSync(config_path) == false) {
 		changes = true;
-		console.log(chalk.gray('ewiki.config.json exists'));
+		console.log(chalk.yellowBright('[WARN] config file not found , we will generate default config file first.'));
 		// 创建默认配置文件
 		fs.writeFileSync(
 			config_path,
@@ -155,6 +157,8 @@ function init(config_path: string) {
 				console.log(chalk.greenBright('generated: [folder] ' + folder));
 			}
 		});
+	} else {
+		console.log(chalk.gray('ewiki.config.json exists'));
 	}
 
 	const cfg: Config = JSON.parse(fs.readFileSync(config_path).toString());
@@ -181,9 +185,7 @@ function init(config_path: string) {
 		console.log(chalk.greenBright('generated: [file] ./index.md'));
 	}
 
-	if (changes === false) {
-		console.log(chalk.greenBright('nothing changes'));
-	}
+	return changes;
 }
 
 /**
