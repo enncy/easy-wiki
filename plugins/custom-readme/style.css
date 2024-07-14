@@ -32,10 +32,6 @@ hr {
 	align-items: center;
 }
 
-.header .container div + div {
-	margin-left: 24px;
-}
-
 .wrapper {
 	width: 100%;
 	height: 100%;
