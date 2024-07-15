@@ -94,7 +94,12 @@
 							const base_url = __ewiki_config__.base_url.endsWith('/')
 								? __ewiki_config__.base_url.slice(0, -1)
 								: __ewiki_config__.base_url;
-							a.href = `${base_url}/${info.dest}`;
+							a.href =
+								'/' +
+								String(base_url + '/' + info.dest)
+									.split('/')
+									.filter(Boolean)
+									.join('/');
 							a.innerText = info.filename;
 
 							div.appendChild(a);
