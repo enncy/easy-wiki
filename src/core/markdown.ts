@@ -97,12 +97,13 @@ export function renderMarkdownTo(file_info: FileInfo) {
 	} else {
 		dom.window.document.body.innerHTML = html;
 	}
-	for (const plugin of EWiki.plugins) {
-		plugin.onHtmlFileRender?.(file_info.filepath, file_info.dest, file_info.markdown_context, dom.window);
-	}
 	// 输出文件
 	if (fs.existsSync(dirname(file_info.dest)) === false) {
 		fs.mkdirSync(dirname(file_info.dest), { recursive: true });
+	}
+
+	for (const plugin of EWiki.plugins) {
+		plugin.onHtmlFileRender?.(file_info.filepath, file_info.dest, file_info.markdown_context, dom.window);
 	}
 
 	const rendered_html = dom.serialize();
