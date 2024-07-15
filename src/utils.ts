@@ -39,7 +39,7 @@ export function getFileInfo(filepath: string, ctx: MarkdownContext, file_content
 		dirname: dir,
 		filename: filename,
 		filepath: filepath,
-		dest: resolve(join(EWiki.config.output_folder, join(dir, '../', filename.slice(0, -3) + '.html'))),
+		dest: resolve(join(EWiki.config.output_folder, join(dir, filename.slice(0, -3) + '.html'))),
 		create_at: stat.birthtime.getTime(),
 		update_at: stat.mtime.getTime(),
 		file_content: content,
