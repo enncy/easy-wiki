@@ -73,10 +73,6 @@
 					results.innerHTML = '';
 					results.focus();
 
-					const readme_info = (__ewiki_files_info__ || []).find(
-						(info) => info.markdown_context.is_readme_file === true
-					);
-
 					let has_searched = false;
 
 					for (const info of __ewiki_files_info__ || []) {
