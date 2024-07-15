@@ -11,10 +11,25 @@ const style_content = fs.readFileSync(resolve(__dirname, './style.css')).toStrin
 exports.default = {
     // 最后执行
     priority: 99,
+    onHtmlFileRender() {
+        if (process.env._not_build === 'true') {
+            return
+        }
+        console.log('[extra-widget] rebuilding all files...');
+        try {
+            if (process.env._not_build === 'true') {
+                return
+            }
+            child_process.execSync('ewiki', { env: Object.assign(process.env, { _not_build: 'true', _is_watching: 'true' }) })
+        } catch (e) {
+            console.log('[extra-widget] rebuilding failed :' + e?.message || 'unknown error');
+        }
+        console.log('[extra-widget] rebuilding finished.');
+        Object.assign(process.env, { _not_build: 'false' })
+    },
     onRenderFinish(infos) {
         // 根据文件名排序
         const sources = infos.sort((a, b) => a.filepath.localeCompare(b.filepath))
-
 
         // 各个文件基本信息，添加到 html 中方便脚本处理
         const raw_infos = JSON.parse(JSON.stringify(sources)).map(info => {

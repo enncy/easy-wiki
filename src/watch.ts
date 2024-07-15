@@ -47,6 +47,10 @@ export function watch(cfg: Config) {
 		const ctx = getMarkdownContext(file_content);
 		/** 获取文件信息 */
 		const info = getFileInfo(resolve(path), ctx, file_content);
+		if (ctx.content.length === 0) {
+			console.log({ path, file_content, ctx });
+			throw new Error('ctx content is empty!');
+		}
 		/** 解析文件 */
 		info.file_content = parseMarkdownContext(ctx);
 		fs.writeFileSync(path, info.file_content);

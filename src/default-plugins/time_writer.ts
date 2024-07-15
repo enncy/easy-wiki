@@ -1,9 +1,13 @@
-import { FileInfo, MarkdownContext, Plugin } from '../interface';
+import { FileInfo, Plugin } from '../interface';
 import fs from 'fs';
 import { parseMarkdownContext } from '../utils';
 
 export default class TimeWriterPlugin implements Plugin {
 	onRenderFinish(file_info: FileInfo[]) {
+		// 在监听模式下不对文件进行操作
+		if (process.env._is_watching === 'true') {
+			return;
+		}
 		for (const info of file_info) {
 			const ctx = info.markdown_context;
 			if (!!ctx.metadata.create_at === false) {
