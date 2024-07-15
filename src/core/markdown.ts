@@ -97,16 +97,17 @@ export function renderMarkdownTo(file_info: FileInfo) {
 	} else {
 		dom.window.document.body.innerHTML = html;
 	}
+
+	for (const plugin of EWiki.plugins) {
+		plugin.onHtmlFileRender?.(file_info.filepath, file_info.dest, file_info.markdown_context, dom.window);
+	}
+
 	// 输出文件
 	if (fs.existsSync(dirname(file_info.dest)) === false) {
 		fs.mkdirSync(dirname(file_info.dest), { recursive: true });
 	}
 	const rendered_html = dom.serialize();
 	fs.writeFileSync(file_info.dest, rendered_html);
-
-	for (const plugin of EWiki.plugins) {
-		plugin.onHtmlFileRender?.(file_info.filepath, file_info.dest, file_info.markdown_context, dom.window);
-	}
 
 	return Object.assign(file_info, { rendered_html: rendered_html });
 }
