@@ -1,9 +1,12 @@
 ---ewiki-config---
 create_at=2024/7/12 18:54:27
-update_at=2024/7/14 21:11:14
+update_at=2024/7/15 13:48:52
 sidebar=首页
 title=EWiki Docs
 ---ewiki-config---
+
+
+
 
 
 # easy-wiki docs
@@ -35,9 +38,9 @@ npm install ewiki -g
 ```sh
 # 初始化项目
 ewiki init
-# 监听文件变化，并构建对应的文件
+# 监听文件变化，并构建对应的文件，执行前以及结束后会全部构建一遍文件
 ewiki watch
-# 构建文档
+# 构建全部文档
 ewiki
 ```
 
@@ -76,6 +79,12 @@ ewiki
   "html_template": "./template.html",
   // 默认样式文件
   "styles": ["./style.css"],
+  // 本地测试服务以及线上配置，使用 ewiki watch 命令后会开启测试服务，访问控制台后即可查看效果
+  "server": {
+    "port": 3019,
+    // 根路径，如果直接由域名访问则为空，如果是子路径则填写子路径，例如： "base_url":"/easy-wiki"
+    "base_url": "/" 
+  },
   // 默认入口文档挂载点
   "markdown_mount": ".markdown-body",
   // 默认的Markdown-It实例化参数，文档：https://markdown-it.github.io/markdown-it/#MarkdownIt.new

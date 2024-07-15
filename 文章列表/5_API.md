@@ -1,8 +1,9 @@
 ---ewiki-config---
 create_at=2024/7/13 20:15:06
-update_at=2024/7/14 21:11:14
+update_at=2024/7/15 13:48:52
 sidebar=API
 ---ewiki-config---
+
 
 
 
@@ -18,9 +19,7 @@ export type Plugin = {
 	/** 执行优先级 */
 	priority?: number;
 	/** 当 markdown-it 对象初始化时触发 */
-	onMarkdownItInit?: (markdownIt: MarkdownIt) => void;
-	/** 当markdown文件发生变化时触发 */
-	onMarkdownChange?: (filepath: string, ctx: MarkdownContext) => void;
+	onMarkdownItInit?: (markdownIt: MarkdownIt) => void; 
 	/**
 	 * 渲染html文件时触发
 	 * @param filepath markdown文件路径
@@ -73,9 +72,7 @@ export type Plugin = {
 	/** 执行优先级 */
 	priority?: number;
 	/** 当 markdown-it 对象初始化时触发 */
-	onMarkdownItInit?: (markdownIt: MarkdownIt) => void;
-	/** 当markdown文件发生变化时触发 */
-	onMarkdownChange?: (filepath: string, ctx: MarkdownContext) => void;
+	onMarkdownItInit?: (markdownIt: MarkdownIt) => void; 
 	/**
 	 * 渲染html文件时触发
 	 * @param filepath markdown文件路径

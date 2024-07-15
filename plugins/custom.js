@@ -1,8 +1,5 @@
 // @ts-check
-
-const container = require('markdown-it-container')
-
-
+ 
 /** @type {import('../node_modules/ewiki/lib/interface.d.ts').Plugin} */
 exports.default = {
     onMarkdownItInit(md) {
