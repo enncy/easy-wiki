@@ -11,7 +11,7 @@ const style_content = fs.readFileSync(resolve(__dirname, './style.css')).toStrin
 exports.default = {
     // 最后执行
     priority: 99,
-    onHtmlFileRender() {
+    onMarkdownChange() {
         if (process.env._not_build === 'true') {
             return
         }

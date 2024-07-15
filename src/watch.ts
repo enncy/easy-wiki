@@ -59,6 +59,10 @@ export function watch(cfg: Config) {
 
 		if (rendered_html) {
 			printBuildInfo(info);
+
+			for (const plugin of EWiki.plugins) {
+				plugin.onMarkdownChange?.(path, ctx);
+			}
 		}
 	};
 }
