@@ -25,6 +25,10 @@ export interface Config {
 	styles: string[];
 	html_template: string;
 	markdown_mount: string;
+	server?: {
+		port?: number;
+		base_url?: string;
+	};
 	markdown_it_config: Record<string, any>;
 }
 
@@ -47,7 +51,6 @@ program
 		if (fs.existsSync(args.config) == false) {
 			init(args.config);
 		}
-
 		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
 		loadPlugins(EWiki.config!).then(() => {
 			buildAll(EWiki.config!);
@@ -63,7 +66,8 @@ program
 			init(args.config);
 		}
 		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(EWiki.config!).then(() => {
+		loadPlugins(EWiki.config!).then(async () => {
+			await buildAll(EWiki.config!);
 			watch(EWiki.config!);
 		});
 	});
@@ -90,7 +94,6 @@ async function loadPlugins(config: Config) {
 			if (
 				instance &&
 				(Reflect.has(instance, 'onMarkdownItInit') ||
-					Reflect.has(instance, 'onMarkdownChange') ||
 					Reflect.has(instance, 'onHtmlFileRender') ||
 					Reflect.has(instance, 'onRenderFinish'))
 			) {
@@ -110,7 +113,7 @@ async function loadPlugins(config: Config) {
 		return (a.priority || 0) - (b.priority || 0);
 	});
 
-	console.log(chalk.blueBright('plugins load finish\n'));
+	console.log(chalk.blueBright('plugins load finish'));
 }
 
 function init(config_path: string) {
@@ -132,6 +135,10 @@ function init(config_path: string) {
 					html_template: './template.html',
 					styles: ['./style.css'],
 					markdown_mount: '.markdown-body',
+					server: {
+						port: 3019,
+						base_url: '/'
+					},
 					markdown_it_config: {
 						html: true,
 						xhtmlOut: false,

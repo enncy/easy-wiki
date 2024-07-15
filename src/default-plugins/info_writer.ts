@@ -24,6 +24,16 @@ export default class InfoWriterPlugin implements Plugin {
 		)}"));`;
 		document.head.append(script);
 
+		// 添加配置信息
+		const config_script = document.createElement('script');
+
+		config_script.innerHTML = `window.__ewiki_config__ = JSON.parse(decodeURIComponent("${encodeURIComponent(
+			JSON.stringify({
+				base_url: EWiki.config.server?.base_url || ''
+			})
+		)}"));`;
+		document.head.append(config_script);
+
 		// 修改 meta 标签
 		const meta_desc = document.querySelector('meta[name="description"]');
 		if (meta_desc) {

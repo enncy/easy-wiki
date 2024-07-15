@@ -22,6 +22,11 @@ export function getMarkdownContext(content: string) {
 }
 
 export function parseMarkdownContext(ctx: MarkdownContext) {
+	if (ctx.content.length === 0) {
+		console.log(ctx);
+		throw new Error('ctx content is empty!');
+	}
+
 	return [
 		'---ewiki-config---',
 		...Object.entries(ctx.metadata).map(([key, value]) => `${key}=${value}`),

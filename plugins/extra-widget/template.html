@@ -95,7 +95,10 @@
 							const span = document.createElement('span');
 							span.innerHTML = part1.slice(0, 20) + `<mark>${keyword}</mark>` + part2.slice(0, 20) + '...';
 							const a = document.createElement('a');
-							a.href = `${readme_info.markdown_context.metadata.sidebar_url_base}/${info.dest}`;
+							const base_url = __ewiki_config__.base_url.endsWith('/')
+								? __ewiki_config__.base_url.slice(0, -1)
+								: __ewiki_config__.base_url;
+							a.href = `${base_url}/${info.dest}`;
 							a.innerText = info.filename;
 
 							div.appendChild(a);

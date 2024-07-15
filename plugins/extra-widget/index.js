@@ -11,20 +11,6 @@ const style_content = fs.readFileSync(resolve(__dirname, './style.css')).toStrin
 exports.default = {
     // 最后执行
     priority: 99,
-    onMarkdownChange() {
-        if (process.env._not_build === 'true') {
-            return
-        }
-        console.log('[extra-widget] rebuilding all files...');
-        try {
-            child_process.execSync('ewiki', { env: Object.assign(process.env, { _not_build: 'true' }) })
-        } catch (e) {
-            console.log('[extra-widget] rebuilding failed :' + e?.message || 'unknown error');
-        }
-        console.log('[extra-widget] rebuilding finished.');
-
-        Object.assign(process.env, { _not_build: 'false' })
-    },
     onRenderFinish(infos) {
         // 根据文件名排序
         const sources = infos.sort((a, b) => a.filepath.localeCompare(b.filepath))
@@ -74,7 +60,7 @@ function buildFile(
 
         // 添加顶部额外链接信息
         const header_extra_el = document.querySelector('.header .extra')
-        const header_links = EWiki.config?.["extra-widget-plugin"]?.["header-links"] || []
+        const header_links = EWiki.config?.extra_widget_plugin?.header_links || []
         if (header_extra_el) {
             addExtraLinks(document, header_extra_el, header_links)
         } else {
@@ -86,7 +72,7 @@ function buildFile(
 
         // 添加底部组件 
         const footer_el = document.querySelector('.footer')
-        const footer_template = EWiki.config?.["extra-widget-plugin"]?.["footer-template"] || ''
+        const footer_template = EWiki.config?.extra_widget_plugin?.footer_template || ''
         if (footer_template) {
             if (footer_el) {
                 let content = fs.readFileSync(footer_template, { encoding: 'utf-8' }).toString()
@@ -112,7 +98,7 @@ function buildFile(
 
         // 添加侧边栏额外链接信息
         const sidebar_extra_el = document.querySelector('.sidebar-wrapper .extra')
-        const sidebar_links_group = EWiki.config?.["extra-widget-plugin"]?.["sidebar-links-group"] || []
+        const sidebar_links_group = EWiki.config?.extra_widget_plugin?.sidebar_links_group || []
         if (sidebar_extra_el) {
             for (const group of sidebar_links_group) {
                 const group_el = document.createElement('div')
@@ -130,8 +116,8 @@ function buildFile(
         }
 
         // 添加首页链接
-        let sidebar_url_base = String(EWiki.config?.["extra-widget-plugin"]?.["sidebar-url-base"] || '')
-        sidebar_url_base = sidebar_url_base.endsWith('/') ? sidebar_url_base.slice(1) : sidebar_url_base
+        let base_url = String(EWiki.config.server?.base_url || '')
+        base_url = base_url.endsWith('/') ? base_url.slice(0, -1) : base_url
 
         // 生成各级别父元素
         for (const source of sources) {
@@ -183,7 +169,7 @@ function buildFile(
                     const name = source.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                     const a = document.createElement('a')
                     a.textContent = name
-                    const href = (sidebar_url_base || '') + join(source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
+                    const href = (base_url || '') + join(source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
                     a.setAttribute('href', href)
 
                     container_el.appendChild(a)

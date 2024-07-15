@@ -5,9 +5,22 @@ import { Config } from './cmd';
 import fs from 'fs';
 import { getFileInfo, getMarkdownContext, parseMarkdownContext, printBuildInfo } from './utils';
 import { renderMarkdownTo } from './core/markdown';
+import express from 'express';
 
 export function watch(cfg: Config) {
-	console.log(chalk.blueBright('\n\n[easy-wiki]:'), 'watcher running!');
+	const app = express();
+
+	app.use(cfg.server?.base_url || '', express.static(process.cwd()));
+
+	const port = cfg.server?.port || 3019;
+
+	app.listen(port, () => {
+		console.log(
+			chalk.blueBright('\n[easy-wiki watcher]:'),
+			'watcher server running : http://localhost:' + port + (cfg.server?.base_url || '')
+		);
+		console.log('\n');
+	});
 
 	if (!fs.existsSync(cfg.output_folder)) {
 		fs.mkdirSync(cfg.output_folder, { recursive: true });
@@ -38,18 +51,9 @@ export function watch(cfg: Config) {
 		info.file_content = parseMarkdownContext(ctx);
 		fs.writeFileSync(path, info.file_content);
 
-		let origin_content = ctx.content;
-		let origin_metadata = JSON.parse(JSON.stringify(ctx.metadata));
+		const { rendered_html } = renderMarkdownTo(info) || {};
 
-		if (renderMarkdownTo(info)) {
-			for (const plugin of EWiki.plugins) {
-				plugin.onMarkdownChange?.(resolve(path), ctx);
-				if (origin_content !== ctx.content || JSON.stringify(origin_metadata) !== JSON.stringify(ctx.metadata)) {
-					origin_content = ctx.content;
-					origin_metadata = ctx.metadata;
-					fs.writeFileSync(path, parseMarkdownContext(ctx));
-				}
-			}
+		if (rendered_html) {
 			printBuildInfo(info);
 		}
 	};

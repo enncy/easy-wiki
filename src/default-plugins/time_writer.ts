@@ -3,12 +3,6 @@ import fs from 'fs';
 import { parseMarkdownContext } from '../utils';
 
 export default class TimeWriterPlugin implements Plugin {
-	onMarkdownChange(filepath: string, ctx: MarkdownContext): void {
-		if (!!ctx.metadata.create_at === false) {
-			ctx.metadata.create_at = fs.statSync(filepath).birthtime.toLocaleString();
-		}
-		ctx.metadata.update_at = new Date().toLocaleString();
-	}
 	onRenderFinish(file_info: FileInfo[]) {
 		for (const info of file_info) {
 			const ctx = info.markdown_context;

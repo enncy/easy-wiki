@@ -39,8 +39,6 @@ export type Plugin = {
 	priority?: number;
 	/** 当 markdown-it 对象初始化时触发 */
 	onMarkdownItInit?: (markdownIt: MarkdownIt) => void;
-	/** 当markdown文件发生变化时触发 */
-	onMarkdownChange?: (filepath: string, ctx: MarkdownContext) => void;
 	/**
 	 * 渲染html文件时触发
 	 * @param filepath markdown文件路径
