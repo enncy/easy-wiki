@@ -125,7 +125,7 @@ function buildFile(
                 continue
             }
             // 去掉 文件名，只要中间部分 
-            const parts = getFilepathParts(changeParentFolder(EWiki.config.output_folder, '/', source.dest.replace(process.cwd(), ''))).slice(0, -1)
+            const parts = getFilepathParts(changeParentFolder(source.dest.replace(process.cwd(), ''), EWiki.config.output_folder, '/')).slice(0, -1)
             // 长度为零说明是根目录，则不创建任何元素，跳过到直接创建链接
             if (parts.length === 0) {
                 continue
@@ -154,12 +154,12 @@ function buildFile(
         }
 
         // 获取基础链接
-        let base_url = String(EWiki.config.watcher?.base_url?.trim() || '/')
+        const base_url = String(EWiki.config.server?.base_url?.trim() || '/')
 
         // 创建链接
         for (const source of sources) {
             if (source.markdown_context.metadata.sidebar != undefined) {
-                const parts = getFilepathParts(changeParentFolder(EWiki.config.output_folder, '/', source.dest.replace(process.cwd(), '')))
+                const parts = getFilepathParts(changeParentFolder(source.dest.replace(process.cwd(), ''), EWiki.config.output_folder, '/'))
                 const parent = [...parts].slice(0, -1).map(p => `[data-folder="${p}"]`).join(' ')
                 let container_el;
                 // parent 为空则说明是根目录
@@ -173,7 +173,7 @@ function buildFile(
                     const name = source.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                     const a = document.createElement('a')
                     a.textContent = name
-                    a.setAttribute('href', changeParentFolder(EWiki.config.output_folder, base_url, source.dest.replace(process.cwd(), '')).replace(/\\/g, '/'))
+                    a.setAttribute('href', changeParentFolder(source.dest.replace(process.cwd(), ''), EWiki.config.output_folder, base_url).replace(/\\/g, '/'))
                     container_el.appendChild(a)
                     container_el.setAttribute('open', '')
                 }
@@ -235,11 +235,16 @@ function getFilepathParts(filepath) {
     return filepath.replace(process.cwd(), '').replace(/\\/g, '/').split('/').filter(s => s.trim())
 }
 
-function changeParentFolder(origin_folder, dest_folder, filepath) {
-    return optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder));
+function changeParentFolder(filepath, origin_folder, dest_folder) {
+    const opt = optimizePath(origin_folder)
+    if (opt === '/') {
+        return optimizePath(optimizePath(dest_folder) + '/' + optimizePath(filepath))
+
+    }
+    return optimizePath(optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder)));
 }
 
 function optimizePath(filepath) {
-    return filepath.replace(/\\/g, '/').split('/').filter(s => s !== '.').filter(s => s.trim()).join('/')
+    return '/' + filepath.replace(/\\/g, '/').split('/').filter(s => s !== '.').filter(s => s.trim()).join('/')
 }
 

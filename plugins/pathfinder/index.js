@@ -19,7 +19,7 @@ exports.default = {
                 const { window: { document } } = jsdom
 
                 // 获取基础链接
-                const base_url = String(EWiki.config.watcher?.base_url?.trim() || '/')
+                const base_url = String(EWiki.config.server?.base_url?.trim() || '/')
 
 
                 // 最后，优化全部路径 

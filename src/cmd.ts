@@ -25,7 +25,7 @@ export interface Config {
 	styles: string[];
 	html_template: string;
 	markdown_mount: string;
-	watcher?: {
+	server?: {
 		port?: number;
 		base_url?: string;
 	};

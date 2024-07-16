@@ -10,14 +10,17 @@ import express from 'express';
 export function watch(cfg: Config) {
 	const app = express();
 
-	app.use('/', express.static(EWiki.config.output_folder));
+	app.use(cfg.server?.base_url || '/', express.static(EWiki.config.output_folder));
 
-	const port = cfg.watcher?.port || 3019;
+	const port = cfg.server?.port || 3019;
 
 	app.listen(port, () => {
-		console.log(chalk.blueBright('\n[easy-wiki watcher]:'), 'watcher server running at : http://localhost:' + port);
 		console.log(
-			chalk.blueBright('[easy-wiki watcher]:'),
+			chalk.blueBright('\n[easy-wiki watch server]:'),
+			'server running at : http://localhost:' + port + (cfg.server?.base_url || '/')
+		);
+		console.log(
+			chalk.blueBright('[easy-wiki watch server]:'),
 			`use '${EWiki.config.output_folder}' as static resource folder`
 		);
 		console.log('\n');

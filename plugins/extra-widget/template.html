@@ -105,10 +105,10 @@
 							const span = document.createElement('span');
 							span.innerHTML = part1.slice(0, 20) + `<mark>${keyword}</mark>` + part2.slice(0, 20) + '...';
 							const a = document.createElement('a');
-							const base_url = __ewiki_config__.base_url.endsWith('/')
-								? __ewiki_config__.base_url.slice(0, -1)
-								: __ewiki_config__.base_url;
-							a.href = changeParentFolder(__ewiki_config__.output_folder, base_url, info.dest);
+
+							const base_url = String(__ewiki_config__.base_url?.trim() || '/');
+
+							a.href = changeParentFolder(info.dest, __ewiki_config__.output_folder, base_url);
 							a.innerText = info.markdown_context.metadata.sidebar || 'unknown';
 
 							div.appendChild(a);
@@ -123,17 +123,24 @@
 				});
 			});
 
-			function changeParentFolder(origin_folder, dest_folder, filepath) {
-				return optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder));
+			function changeParentFolder(filepath, origin_folder, dest_folder) {
+				const opt = optimizePath(origin_folder);
+				if (opt === '/') {
+					return optimizePath(optimizePath(dest_folder) + '/' + optimizePath(filepath));
+				}
+				return optimizePath(optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder)));
 			}
 
 			function optimizePath(filepath) {
-				return filepath
-					.replace(/\\/g, '/')
-					.split('/')
-					.filter((s) => s !== '.')
-					.filter((s) => s.trim())
-					.join('/');
+				return (
+					'/' +
+					filepath
+						.replace(/\\/g, '/')
+						.split('/')
+						.filter((s) => s !== '.')
+						.filter((s) => s.trim())
+						.join('/')
+				);
 			}
 		</script>
 	</body>
