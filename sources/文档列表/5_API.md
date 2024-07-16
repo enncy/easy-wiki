@@ -1,8 +1,9 @@
 ---ewiki-config---
 create_at=2024/7/13 20:15:06
-update_at=2024/7/15 14:07:58
+update_at=2024/7/16 21:20:43
 sidebar=API
 ---ewiki-config---
+
 
 
 
@@ -60,9 +61,7 @@ export interface MarkdownContext {
 		/** 输出绑定在页面上的元素，默认是 body ，可以根据template字段进行自定义 */
 		mount?: string;
 		/** 指定的模版文件，如果没有则使用配置中默认模版，如果配置也没设置，则为空白页面 */
-		template?: string;
-		/** 指定的脚本文件  */
-		scripts?: string;
+		template?: string; 
 		/** 指定的样式文件，如果没有则使用配置中默认样式 */
 		styles?: string;
 	} & Record<string, string | undefined>;

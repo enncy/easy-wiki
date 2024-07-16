@@ -1,6 +1,13 @@
 <div>
   <hr />
   <p>powered by <a href="https://github.com/enncy/easy-wiki"> easy-wiki </a></p>
-  <p>update_at：{{METADATA.update_at}}</p>
-  <p>create_at：{{METADATA.create_at}}</p>
+  <p>更新于：<span class="footer-time">{{METADATA.update_at}}</span></p>
+  <p>创建于：<span class="footer-time">{{METADATA.create_at}}</span></p>
+  <script>
+      window.addEventListener("load",()=>{
+          document.querySelectorAll(".footer-time").forEach((el)=>{
+            el.innerText = new Date(el.innerText).toLocaleString("zh-CN").replace(/\//g,'-')
+          })
+      })
+  </script>
 </div>
