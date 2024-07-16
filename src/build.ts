@@ -1,13 +1,16 @@
 import { Config } from './cmd';
 import { renderMarkdownTo } from './core/markdown';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { glob } from 'glob';
 import fs from 'fs';
-import { getFileInfo, getMarkdownContext, printBuildInfo } from './utils';
+import { changeParentFolder, getFileInfo, getMarkdownContext, printBuildInfo } from './utils';
 import chalk from 'chalk';
 import { FileInfo } from './interface';
+import fse from 'fs-extra';
 
 export async function buildAll(cfg: Config) {
+	copyOtherResources(cfg);
+
 	const infos = await createFileInfos(cfg);
 
 	const rendered_infos = [];
@@ -26,7 +29,8 @@ export async function buildAll(cfg: Config) {
 }
 
 export async function createFileInfos(cfg: Config) {
-	const files = await glob(cfg.sources, { ignore: cfg.ignore_sources });
+	const files = await glob(join(cfg.sources_folder, '**/*.md').replace(/\\/g, '/'), { ignore: cfg.ignore_sources });
+
 	return Promise.all(
 		files.map((file) => {
 			return new Promise<FileInfo>((resolve_promise, reject) => {
@@ -39,4 +43,21 @@ export async function createFileInfos(cfg: Config) {
 			});
 		})
 	);
+}
+
+// 复制其他资源文件
+async function copyOtherResources(cfg: Config) {
+	const files = await glob(join(cfg.sources_folder, '**/*.*').replace(/\\/g, '/'), {
+		ignore: [
+			...cfg.ignore_sources,
+			// 忽略所有的md文件
+			'**/*.md'
+		]
+	});
+
+	for (const file of files) {
+		fse.copySync(resolve(file), changeParentFolder(cfg.sources_folder, cfg.output_folder, file), {
+			overwrite: true
+		});
+	}
 }

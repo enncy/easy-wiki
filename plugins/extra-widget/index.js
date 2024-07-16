@@ -84,26 +84,15 @@ function buildFile(
             }
         }
 
+        // 添加head模板
+        appendTemplate(EWiki.config?.extra_widget_plugin?.head_template, file_info.markdown_context.metadata, document.head)
+        // 添加body模板
+        appendTemplate(EWiki.config?.extra_widget_plugin?.body_template, file_info.markdown_context.metadata, document.body)
+        // 添加文档顶部组件   
+        appendTemplate(EWiki.config?.extra_widget_plugin?.markdown_header_template, file_info.markdown_context.metadata, document.querySelector('.markdown-header'))
+        // 添加文档底部组件   
+        appendTemplate(EWiki.config?.extra_widget_plugin?.markdown_footer_template, file_info.markdown_context.metadata, document.querySelector('.markdown-footer'))
 
-        // 添加底部组件 
-        const footer_el = document.querySelector('.footer')
-        const footer_template = EWiki.config?.extra_widget_plugin?.footer_template || ''
-        if (footer_template) {
-            if (footer_el) {
-                let content = fs.readFileSync(footer_template, { encoding: 'utf-8' }).toString()
-                const metadata = file_info.markdown_context.metadata
-                for (const key in metadata) {
-                    if (Object.hasOwnProperty.call(metadata, key)) {
-                        if (metadata[key]) {
-                            content = content.replace(new RegExp(`{{METADATA.${key}}}`, 'g'), metadata[key])
-                        }
-                    }
-                }
-                footer_el.innerHTML = content
-            } else {
-                console.log('[extra-widget] [WARN] : footer element not found, please add a div with class "footer" in ".markdown-wrapper"')
-            }
-        }
 
         // 以下是侧边栏操作
         const sidebar = document.querySelector('.sidebar')
@@ -130,17 +119,13 @@ function buildFile(
             }
         }
 
-        // 添加首页链接
-        let base_url = String(EWiki.config.server?.base_url || '')
-        base_url = base_url.endsWith('/') ? base_url.slice(0, -1) : base_url
-
         // 生成各级别父元素
         for (const source of sources) {
             if (source.markdown_context.metadata.sidebar == undefined) {
                 continue
             }
-            // 去掉 文件名，只要中间部分
-            const parts = getFilepathParts(source.filepath).slice(0, -1)
+            // 去掉 文件名，只要中间部分 
+            const parts = getFilepathParts(changeParentFolder(EWiki.config.output_folder, '/', source.dest.replace(process.cwd(), ''))).slice(0, -1)
             // 长度为零说明是根目录，则不创建任何元素，跳过到直接创建链接
             if (parts.length === 0) {
                 continue
@@ -168,10 +153,13 @@ function buildFile(
             }
         }
 
+        // 获取基础链接
+        let base_url = String(EWiki.config.watcher?.base_url?.trim() || '/')
+
         // 创建链接
         for (const source of sources) {
             if (source.markdown_context.metadata.sidebar != undefined) {
-                const parts = getFilepathParts(source.filepath)
+                const parts = getFilepathParts(changeParentFolder(EWiki.config.output_folder, '/', source.dest.replace(process.cwd(), '')))
                 const parent = [...parts].slice(0, -1).map(p => `[data-folder="${p}"]`).join(' ')
                 let container_el;
                 // parent 为空则说明是根目录
@@ -185,14 +173,31 @@ function buildFile(
                     const name = source.markdown_context.metadata.sidebar || [...parts].slice(-1)[0]
                     const a = document.createElement('a')
                     a.textContent = name
-                    const href = (base_url || '') + join(source.dest.replace(process.cwd(), '')).replace(/\\/g, '/')
-                    a.setAttribute('href', href)
-
+                    a.setAttribute('href', changeParentFolder(EWiki.config.output_folder, base_url, source.dest.replace(process.cwd(), '')).replace(/\\/g, '/'))
                     container_el.appendChild(a)
                     container_el.setAttribute('open', '')
                 }
             }
         }
+        // 最后，优化全部路径 
+        document.querySelectorAll('img, video, audio')?.forEach(el => {
+            const src = el.getAttribute('src')
+            if (src && src.startsWith('.')) {
+                el.setAttribute('src', join(base_url, changeParentFolder(EWiki.config.output_folder, base_url, src)).replace(/\\/g, '/'))
+            }
+        })
+
+        document.querySelectorAll('a')?.forEach(el => {
+            let href = el.getAttribute('href')
+            if (href && href.startsWith('.')) {
+                if (href.endsWith('.md')) {
+                    href = href.replace('.md', '.html')
+                }
+                el.setAttribute('href', join(base_url, changeParentFolder(EWiki.config.output_folder, base_url, href)).replace(/\\/g, '/'))
+            }
+        })
+
+
 
         fs.writeFile(file_info.dest, jsdom.serialize(), { encoding: 'utf-8' }, (err) => {
             if (err) {
@@ -227,8 +232,33 @@ function addExtraLinks(document, container, links) {
     }
 }
 
+function appendTemplate(template_filepath, metadata, append_el) {
+    const markdown_footer_template = template_filepath || ''
+    if (markdown_footer_template) {
+        if (append_el) {
+            let content = fs.readFileSync(markdown_footer_template, { encoding: 'utf-8' }).toString()
+            for (const key in metadata) {
+                if (Object.hasOwnProperty.call(metadata, key)) {
+                    if (metadata[key]) {
+                        content = content.replace(new RegExp(`{{METADATA.${key}}}`, 'g'), metadata[key])
+                    }
+                }
+            }
+            append_el.innerHTML += content
+        }
+    }
+}
+
 /** @return {string[]} */
 function getFilepathParts(filepath) {
-
     return filepath.replace(process.cwd(), '').replace(/\\/g, '/').split('/').filter(s => s.trim())
 }
+
+function changeParentFolder(origin_folder, dest_folder, filepath) {
+    return optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder));
+}
+
+function optimizePath(filepath) {
+    return filepath.replace(/\\/g, '/').split('/').filter(s => s !== '.').filter(s => s.trim()).join('/')
+}
+

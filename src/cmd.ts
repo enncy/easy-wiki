@@ -17,15 +17,15 @@ global.EWiki = {
 };
 
 export interface Config {
-	sources: string[];
 	plugins: string[];
+	sources_folder: string;
 	output_folder: string;
 	ignore_sources: string[];
 	ignore_plugins: string[];
 	styles: string[];
 	html_template: string;
 	markdown_mount: string;
-	server?: {
+	watcher?: {
 		port?: number;
 		base_url?: string;
 	};
@@ -127,10 +127,10 @@ function init(config_path: string) {
 			config_path,
 			JSON.stringify(
 				{
-					sources: ['./**/*.md'],
 					plugins: ['./plugins/**/*.js'],
 					output_folder: './dist',
-					ignore_sources: ['./**/*.ignore.md', './node_modules/**/*.md'],
+					sources_folder: './sources',
+					ignore_sources: ['./**/*.ignore.md', './**/*.ignore.png', './**/*.ignore.video', './node_modules/**/*.md'],
 					ignore_plugins: ['./**/*.ignore.js', './node_modules/**/*.js'],
 					html_template: './template.html',
 					styles: ['./style.css'],

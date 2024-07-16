@@ -39,7 +39,7 @@ export function getFileInfo(filepath: string, ctx: MarkdownContext, file_content
 		dirname: dir,
 		filename: filename,
 		filepath: filepath,
-		dest: resolve(join(EWiki.config.output_folder, join(dir, filename.slice(0, -3) + '.html'))),
+		dest: changeParentFolder(EWiki.config.sources_folder, EWiki.config.output_folder, filepath.slice(0, -3) + '.html'),
 		create_at: stat.birthtime.getTime(),
 		update_at: stat.mtime.getTime(),
 		file_content: content,
@@ -54,4 +54,14 @@ export function printBuildInfo(info: FileInfo) {
 			' -> ' +
 			info.dest.replace(process.cwd(), '').replace(/\\/g, '/')
 	);
+}
+
+/**
+ * 将文件的父文件夹从 origin_folder 改为 dest_folder
+ * @param origin_folder
+ * @param dest_folder
+ * @param filepath
+ */
+export function changeParentFolder(origin_folder: string, dest_folder: string, filepath: string) {
+	return resolve(filepath).replace(resolve(origin_folder), resolve(dest_folder));
 }

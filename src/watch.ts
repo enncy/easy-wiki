@@ -10,14 +10,15 @@ import express from 'express';
 export function watch(cfg: Config) {
 	const app = express();
 
-	app.use(cfg.server?.base_url || '', express.static(process.cwd()));
+	app.use('/', express.static(EWiki.config.output_folder));
 
-	const port = cfg.server?.port || 3019;
+	const port = cfg.watcher?.port || 3019;
 
 	app.listen(port, () => {
+		console.log(chalk.blueBright('\n[easy-wiki watcher]:'), 'watcher server running at : http://localhost:' + port);
 		console.log(
-			chalk.blueBright('\n[easy-wiki watcher]:'),
-			'watcher server running : http://localhost:' + port + (cfg.server?.base_url || '')
+			chalk.blueBright('[easy-wiki watcher]:'),
+			`use '${EWiki.config.output_folder}' as static resource folder`
 		);
 		console.log('\n');
 	});
@@ -28,7 +29,7 @@ export function watch(cfg: Config) {
 
 	let building = false;
 
-	chokidar.watch(cfg.sources, { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
+	chokidar.watch(join(cfg.sources_folder, '**/*.md'), { ignored: cfg.ignore_sources }).on('change', (path, stats) => {
 		if (building === true) {
 			return;
 		}

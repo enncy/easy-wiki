@@ -44,30 +44,45 @@
 						</div>
 					</div>
 					<div class="markdown-wrapper">
+						<div class="markdown-hreader"></div>
 						<div class="markdown-body"></div>
-						<div class="footer"></div>
+						<div class="markdown-footer"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<script>
+			// @ts-check
+
+			// @ts-ignore
+			const __ewiki_files_info__ = window.__ewiki_files_info__;
+			// @ts-ignore
+			const __ewiki_config__ = window.__ewiki_config__;
+
 			window.addEventListener('load', () => {
-				document.querySelector('.sidebar-trigger').addEventListener('click', () => {
-					document.querySelector('.sidebar-wrapper').classList.toggle('active');
+				document.querySelector('.sidebar-trigger')?.addEventListener('click', () => {
+					document.querySelector('.sidebar-wrapper')?.classList.toggle('active');
 				});
 
 				document.querySelector('.search-results')?.addEventListener('blur', (e) => {
 					// 设置延迟否则无法点击链接
 					setTimeout(() => {
-						document.querySelector('.search-results').style.display = 'none';
+						/** @type {HTMLElement | null} */
+						const el = document.querySelector('.search-results');
+						if (el) el.style.display = 'none';
 					}, 200);
 				});
 
-				document.querySelector('#search-btn').addEventListener('click', () => {
-					document.querySelector('#search-input').value = document.querySelector('#search-input').value.trim();
+				document.querySelector('#search-btn')?.addEventListener('click', () => {
+					/** @type {HTMLInputElement | null} */
 					const searchInput = document.querySelector('#search-input');
+					/** @type {HTMLInputElement | null} */
 					const results = document.querySelector('.search-results');
+					if (!!searchInput === false || !!results === false) {
+						return;
+					}
+					searchInput.value = searchInput.value.trim();
 
 					results.style.display = 'block';
 					results.innerHTML = '';
@@ -94,13 +109,8 @@
 							const base_url = __ewiki_config__.base_url.endsWith('/')
 								? __ewiki_config__.base_url.slice(0, -1)
 								: __ewiki_config__.base_url;
-							a.href =
-								'/' +
-								String(base_url + '/' + info.dest)
-									.split('/')
-									.filter(Boolean)
-									.join('/');
-							a.innerText = info.filename;
+							a.href = changeParentFolder(__ewiki_config__.output_folder, base_url, info.dest);
+							a.innerText = info.markdown_context.metadata.sidebar || 'unknown';
 
 							div.appendChild(a);
 							div.appendChild(span);
@@ -113,6 +123,19 @@
 					}
 				});
 			});
+
+			function changeParentFolder(origin_folder, dest_folder, filepath) {
+				return optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder));
+			}
+
+			function optimizePath(filepath) {
+				return filepath
+					.replace(/\\/g, '/')
+					.split('/')
+					.filter((s) => s !== '.')
+					.filter((s) => s.trim())
+					.join('/');
+			}
 		</script>
 	</body>
 </html>

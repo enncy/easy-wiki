@@ -29,7 +29,9 @@ export default class InfoWriterPlugin implements Plugin {
 
 		config_script.innerHTML = `window.__ewiki_config__ = JSON.parse(decodeURIComponent("${encodeURIComponent(
 			JSON.stringify({
-				base_url: EWiki.config.server?.base_url || ''
+				base_url: EWiki.config.watcher?.base_url || '',
+				sources_folder: EWiki.config.sources_folder,
+				output_folder: EWiki.config.output_folder
 			})
 		)}"));`;
 		document.head.append(config_script);
