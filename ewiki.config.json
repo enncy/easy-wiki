@@ -1,6 +1,6 @@
 { 
   "sources_folder": "./sources",
-  "output_folder": "./dist",
+  "output_folder": "./",
   "plugins": ["./plugins/**/*.js", "ewiki"],
   "ignore_sources": ["./**/*.ignore.md", "./node_modules/**/*.md"],
   "ignore_plugins": ["./**/*.ignore.js", "./node_modules/**/*.js"],
