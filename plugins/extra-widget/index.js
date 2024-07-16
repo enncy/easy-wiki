@@ -179,25 +179,6 @@ function buildFile(
                 }
             }
         }
-        // 最后，优化全部路径 
-        document.querySelectorAll('img, video, audio')?.forEach(el => {
-            const src = el.getAttribute('src')
-            if (src && src.startsWith('.')) {
-                el.setAttribute('src', join(base_url, changeParentFolder(EWiki.config.output_folder, base_url, src)).replace(/\\/g, '/'))
-            }
-        })
-
-        document.querySelectorAll('a')?.forEach(el => {
-            let href = el.getAttribute('href')
-            if (href && href.startsWith('.')) {
-                if (href.endsWith('.md')) {
-                    href = href.replace('.md', '.html')
-                }
-                el.setAttribute('href', join(base_url, changeParentFolder(EWiki.config.output_folder, base_url, href)).replace(/\\/g, '/'))
-            }
-        })
-
-
 
         fs.writeFile(file_info.dest, jsdom.serialize(), { encoding: 'utf-8' }, (err) => {
             if (err) {

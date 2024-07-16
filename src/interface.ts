@@ -27,8 +27,6 @@ export interface MarkdownContext {
 		mount?: string;
 		/** 指定的模版文件，如果没有则使用配置中默认模版，如果配置也没设置，则为空白页面 */
 		template?: string;
-		/** 指定的脚本文件  */
-		scripts?: string;
 		/** 指定的样式文件，如果没有则使用配置中默认样式 */
 		styles?: string;
 	} & Record<string, string | undefined>;

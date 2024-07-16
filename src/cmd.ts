@@ -164,6 +164,14 @@ function init(config_path: string) {
 				console.log(chalk.greenBright('generated: [folder] ' + folder));
 			}
 		});
+
+		const index_md_path = resolve(process.cwd(), './sources/index.md');
+
+		if (fs.existsSync(index_md_path) === false) {
+			changes = true;
+			fs.writeFileSync(index_md_path, 'hello world');
+			console.log(chalk.greenBright('generated: [file] ./index.md'));
+		}
 	} else {
 		console.log(chalk.gray('ewiki.config.json exists'));
 	}
@@ -174,7 +182,6 @@ function init(config_path: string) {
 
 	const template_path = resolve(process.cwd(), cfg.html_template);
 	const style_path = resolve(process.cwd(), cfg.styles[0]);
-	const index_md_path = resolve(process.cwd(), './index.md');
 
 	if (fs.existsSync(template_path) === false) {
 		changes = true;
@@ -185,11 +192,6 @@ function init(config_path: string) {
 		changes = true;
 		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), style_path);
 		console.log(chalk.greenBright('generated: [file] ' + cfg.styles[0]));
-	}
-	if (fs.existsSync(index_md_path) === false) {
-		changes = true;
-		fs.writeFileSync(index_md_path, 'hello world');
-		console.log(chalk.greenBright('generated: [file] ./index.md'));
 	}
 
 	return changes;
