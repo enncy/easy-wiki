@@ -58,7 +58,9 @@ export default class InfoWriterPlugin implements Plugin {
 		}
 
 		// 修改 title
-		document.title = ctx.metadata.title || document.title;
+		if (ctx.metadata.title) {
+			document.title = ctx.metadata.title || document.title;
+		}
 
 		// 添加样式文件
 		[...EWiki.config.styles, ...(ctx.metadata.styles?.split(',') || [])].forEach((style) => {
