@@ -47,14 +47,14 @@ export function watch(cfg: Config) {
 
 	const onChange = (path: string) => {
 		const file_content = fs.readFileSync(path).toString('utf-8');
+		// TODO : 优化，有时候会返回空字符串
+		if (file_content.trim().length === 0) {
+			return;
+		}
 		/** 解析 markdown 上下文 */
 		const ctx = getMarkdownContext(file_content);
 		/** 获取文件信息 */
 		const info = getFileInfo(resolve(path), ctx, file_content);
-		if (ctx.content.length === 0) {
-			console.log({ path, file_content, ctx });
-			throw new Error('ctx content is empty!');
-		}
 		/** 解析文件 */
 		info.file_content = parseMarkdownContext(ctx);
 		fs.writeFileSync(path, info.file_content);
