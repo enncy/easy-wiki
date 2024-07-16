@@ -160,6 +160,7 @@ function buildFile(
                     const summary = document.createElement('summary')
                     summary.textContent = part
                     details.appendChild(summary)
+                    details.setAttribute('open', '')
                     root = details
                 } else {
                     root = folder
