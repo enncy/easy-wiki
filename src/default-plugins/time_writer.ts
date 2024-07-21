@@ -10,10 +10,11 @@ export default class TimeWriterPlugin implements Plugin {
 		}
 		for (const info of file_info) {
 			const ctx = info.markdown_context;
+			const stat = fs.statSync(info.filepath);
 			if (!!ctx.metadata.create_at === false) {
-				ctx.metadata.create_at = fs.statSync(info.filepath).birthtime.toLocaleString();
+				ctx.metadata.create_at = stat.birthtime.toLocaleString();
 			}
-			ctx.metadata.update_at = new Date().toLocaleString();
+			ctx.metadata.update_at = stat.mtime.toLocaleString();
 			const md_content = parseMarkdownContext(ctx);
 			// 自动更新文件信息
 			fs.writeFileSync(info.filepath, md_content);
