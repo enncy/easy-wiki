@@ -112,6 +112,10 @@ html {
 	font-weight: bold;
 }
 
+.sidebar > a {
+	display: block;
+}
+
 .search {
 	flex: 0 240px;
 }
