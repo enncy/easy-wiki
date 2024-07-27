@@ -141,6 +141,8 @@ function buildFile(
                 if (!folder) {
                     const details = document.createElement('details')
                     details.setAttribute('data-folder', part);
+                    details.setAttribute('dirname', parts.join('/'));
+
                     (root || sidebar).appendChild(details)
                     const summary = document.createElement('summary')
                     summary.textContent = part
@@ -176,6 +178,18 @@ function buildFile(
                     a.setAttribute('href', changeParentFolder(source.dest.replace(process.cwd(), ''), EWiki.config.output_folder, base_url).replace(/\\/g, '/'))
                     container_el.appendChild(a)
                     container_el.setAttribute('open', '')
+                }
+            }
+        }
+
+        // 为各个父级目录进行重命名
+        const folder_names = EWiki.config?.extra_widget_plugin.folder_names || {}
+        for (const key in folder_names) {
+            if (Object.hasOwnProperty.call(folder_names, key)) {
+                const name = folder_names[key];
+                const summary = document.querySelector(`[dirname="${key}"] summary`)
+                if (summary) {
+                    summary.textContent = String(name || "未命名").trim()
                 }
             }
         }
