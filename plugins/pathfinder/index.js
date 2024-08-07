@@ -33,9 +33,10 @@ exports.default = {
                     let href = el.getAttribute('href')
                     if (href && href.startsWith('.')) {
                         if (href.endsWith('.md')) {
-                            href = href.replace('.md', '.html')
+                            let resolved_href = join(base_url, changeParentFolder(EWiki.config.output_folder, base_url, href)).replace(/\\/g, '/')
+                            resolved_href = resolved_href.replace('.md', '.html')
+                            el.setAttribute('href', resolved_href)
                         }
-                        el.setAttribute('href', join(base_url, changeParentFolder(EWiki.config.output_folder, base_url, href)).replace(/\\/g, '/'))
                     }
                 })
             })
