@@ -5,10 +5,11 @@ import { buildAll } from './build';
 import { watch } from './watch';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import TimeWriterPlugin from './default-plugins/time_writer';
 import InfoWriterPlugin from './default-plugins/info_writer';
 import packageJson from '../package.json';
+import { CommentObject, parse } from 'comment-json';
 
 console.log('[ewiki] start cwd: ' + process.cwd());
 global.EWiki = {
@@ -125,7 +126,7 @@ function init(config_path: string) {
 					output_folder: './dist',
 					sources_folder: './sources',
 					ignore_sources: ['./**/*.ignore.md', './**/*.ignore.png', './**/*.ignore.video', './node_modules/**/*.md'],
-					ignore_plugins: ['./**/*.ignore.js', './node_modules/**/*.js'],
+					ignore_plugins: ['./**/*.ignore.js'],
 					html_template: './template.html',
 					styles: ['./style.css'],
 					markdown_mount: '.markdown-body',
@@ -170,7 +171,7 @@ function init(config_path: string) {
 		console.log(chalk.gray('ewiki.config.json exists'));
 	}
 
-	const cfg: Config = JSON.parse(fs.readFileSync(config_path).toString());
+	const cfg: Config = parse(fs.readFileSync(config_path).toString()) as any;
 
 	// 将当前的默认样式文件和模版文件导入
 
