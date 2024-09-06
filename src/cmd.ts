@@ -8,6 +8,7 @@ import { glob } from 'glob';
 import { join, resolve } from 'path';
 import TimeWriterPlugin from './default-plugins/time_writer';
 import InfoWriterPlugin from './default-plugins/info_writer';
+import packageJson from '../package.json';
 
 console.log('[ewiki] start cwd: ' + process.cwd());
 global.EWiki = {
@@ -33,6 +34,7 @@ export interface Config {
 }
 
 const program = new Command();
+program.version(packageJson.version);
 
 program
 	.command('init')
@@ -44,22 +46,18 @@ program
 	});
 
 // 直接设置为默认命令
-program
-	.version('0.0.3')
-	.option('--config <path>', 'config file path', './ewiki.config.json')
-	.action((args) => {
-		if (fs.existsSync(args.config) == false) {
-			init(args.config);
-		}
-		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
-		loadPlugins(EWiki.config!).then(() => {
-			buildAll(EWiki.config!);
-		});
+program.option('--config <path>', 'config file path', './ewiki.config.json').action((args) => {
+	if (fs.existsSync(args.config) == false) {
+		init(args.config);
+	}
+	EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
+	loadPlugins(EWiki.config!).then(() => {
+		buildAll(EWiki.config!);
 	});
+});
 
 program
 	.command('watch')
-	.version('0.0.3')
 	.option('--config <path>', 'config file path', './ewiki.config.json')
 	.action((args) => {
 		if (fs.existsSync(args.config) == false) {
@@ -80,9 +78,7 @@ async function loadPlugins(config: Config) {
 		ignore: config.ignore_plugins
 	});
 
-	// 尝试寻找NodeModules下的插件文件
-	const node_modules_files = await glob(filterNodeModulesPlugins());
-	files.push(...node_modules_files);
+	console.log(config.plugins, files);
 
 	for (const file of files) {
 		try {
@@ -185,38 +181,14 @@ function init(config_path: string) {
 
 	if (fs.existsSync(template_path) === false) {
 		changes = true;
-		fs.copyFileSync(resolve(__dirname, '../assets/template.html'), template_path);
+		fs.copyFileSync(resolve(__dirname, '../../assets/template.html'), template_path);
 		console.log(chalk.greenBright('generated: [file] ' + cfg.html_template));
 	}
 	if (fs.existsSync(style_path) === false) {
 		changes = true;
-		fs.copyFileSync(resolve(__dirname, '../assets/style.css'), style_path);
+		fs.copyFileSync(resolve(__dirname, '../../assets/style.css'), style_path);
 		console.log(chalk.greenBright('generated: [file] ' + cfg.styles[0]));
 	}
 
 	return changes;
-}
-
-/**
- *  尝试寻找NodeModules下的插件文件
- */
-function filterNodeModulesPlugins() {
-	const valid_plugins = [];
-	for (const plugin_glob of EWiki.config.plugins) {
-		if (plugin_glob.includes('/') === false && plugin_glob.endsWith('.js') === false) {
-			const possible_paths = [join(process.cwd(), 'node_modules', plugin_glob, 'plugins')];
-			let handled = false;
-			for (const pos of possible_paths) {
-				if (fs.existsSync(pos)) {
-					valid_plugins.push(pos + '/**/*.js');
-					handled = true;
-					break;
-				}
-			}
-			if (handled === false) {
-				console.log(chalk.redBright('plugin file not found: ' + plugin_glob));
-			}
-		}
-	}
-	return valid_plugins;
 }

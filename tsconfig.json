@@ -11,7 +11,8 @@
 		"incremental": true,
 		"skipLibCheck": true,
 		"skipDefaultLibCheck": true,
-		"outDir": "./lib"
+		"outDir": "./lib",
+		"resolveJsonModule": true
 	},
 	"include": ["./src/**/*.ts", "index.ts"]
 }

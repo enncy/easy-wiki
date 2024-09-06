@@ -16,7 +16,7 @@ const el = (document, tag, html) => {
 };
 
 
-/** @type {import('../../lib/interface.d.ts').Plugin} */
+/** @type {import('../../lib/src/interface.d.ts').Plugin} */
 exports.default = {
 	onHtmlFileRender(filepath, dest, ctx, { document }) {
 		document.head.append(el(document, 'style', hljs_github_style));

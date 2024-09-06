@@ -1,150 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0"
-		/>
-	</head>
-	<body>
-		<div class="header">
-			<div class="wrapper">
-				<div class="container">
-					<div class="sidebar-trigger-wrapper">
-						<div class="sidebar-trigger">目录 ≡</div>
-					</div>
 
-					<div class="search">
-						<span
-							class="search-results"
-							tabindex="1"
-						></span>
-						<input
-							placeholder="搜索文章"
-							id="search-input"
-						/>
-						<button id="search-btn">搜索</button>
-					</div>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-					<div class="extra"></div>
+<body>
+	<div class="header">
+		<div class="wrapper">
+			<div class="container">
+				<div class="sidebar-trigger-wrapper">
+					<div class="sidebar-trigger">目录 ≡</div>
+				</div>
+
+				<div class="search">
+					<span class="search-results" tabindex="1"></span>
+					<input placeholder="搜索文章" id="search-input" />
+					<button id="search-btn">搜索</button>
+				</div>
+
+				<div class="extra"></div>
+			</div>
+		</div>
+	</div>
+	<div class="content">
+		<div class="wrapper">
+			<div class="container">
+				<div class="sidebar-wrapper">
+					<div class="sidebar">
+						<div style="margin-top: 12px" class="extra"></div>
+						<div style="margin-top: 12px">目录内容</div>
+						<hr />
+						<div class="root-folder"></div>
+					</div>
+				</div>
+				<div class="markdown-wrapper">
+					<div class="markdown-header"></div>
+					<div class="markdown-body"></div>
+					<div class="markdown-footer"></div>
 				</div>
 			</div>
 		</div>
-		<div class="content">
-			<div class="wrapper">
-				<div class="container">
-					<div class="sidebar-wrapper">
-						<div class="sidebar">
-							<div
-								style="margin-top: 12px"
-								class="extra"
-							></div>
-							<div style="margin-top: 12px">目录内容</div>
-							<hr />
-							<div class="root-folder"></div>
-						</div>
-					</div>
-					<div class="markdown-wrapper">
-						<div class="markdown-header"></div>
-						<div class="markdown-body"></div>
-						<div class="markdown-footer"></div>
-					</div>
-				</div>
-			</div>
-		</div>
+	</div>
 
-		<script>
-			// @ts-check
+	<script>
+		// @ts-check
 
-			// @ts-ignore
-			const __ewiki_files_info__ = window.__ewiki_files_info__;
-			// @ts-ignore
-			const __ewiki_config__ = window.__ewiki_config__;
+		// @ts-ignore
+		const __ewiki_files_info__ = window.__ewiki_files_info__;
+		// @ts-ignore
+		const __ewiki_config__ = window.__ewiki_config__;
 
-			window.addEventListener('load', () => {
-				document.querySelector('.sidebar-trigger')?.addEventListener('click', () => {
-					document.querySelector('.sidebar-wrapper')?.classList.toggle('active');
-				});
-
-				document.querySelector('.search-results')?.addEventListener('blur', (e) => {
-					// 设置延迟否则无法点击链接
-					setTimeout(() => {
-						/** @type {HTMLElement | null} */
-						const el = document.querySelector('.search-results');
-						if (el) el.style.display = 'none';
-					}, 200);
-				});
-
-				document.querySelector('#search-btn')?.addEventListener('click', () => {
-					/** @type {HTMLInputElement | null} */
-					const searchInput = document.querySelector('#search-input');
-					/** @type {HTMLInputElement | null} */
-					const results = document.querySelector('.search-results');
-					if (!!searchInput === false || !!results === false) {
-						return;
-					}
-					searchInput.value = searchInput.value.trim();
-
-					results.style.display = 'block';
-					results.innerHTML = '';
-					results.focus();
-
-					let has_searched = false;
-
-					for (const info of __ewiki_files_info__ || []) {
-						/** @type {string} */
-						const content = (new DOMParser().parseFromString(info.text || '', 'text/html').body.textContent || '')
-							.replace(/\n/g, '')
-							.replace(/ +/g, ' ');
-						/** @type {string} */
-						const keyword = searchInput.value;
-						const index = content.indexOf(keyword);
-						if (index !== -1) {
-							has_searched = true;
-							const part1 = content.slice(0, index);
-							const part2 = content.slice(index + keyword.length, content.length);
-							const div = document.createElement('div');
-							const span = document.createElement('span');
-							span.innerHTML = part1.slice(0, 20) + `<mark>${keyword}</mark>` + part2.slice(0, 20) + '...';
-							const a = document.createElement('a');
-
-							const base_url = String(__ewiki_config__.base_url?.trim() || '/');
-
-							a.href = changeParentFolder(info.dest, __ewiki_config__.output_folder, base_url);
-							a.innerText = info.markdown_context.metadata.sidebar || 'unknown';
-
-							div.appendChild(a);
-							div.appendChild(span);
-							results.appendChild(div);
-						}
-					}
-
-					if (has_searched === false) {
-						results.innerHTML = '没有找到相关文章';
-					}
-				});
+		window.addEventListener('load', () => {
+			document.querySelector('.sidebar-trigger')?.addEventListener('click', () => {
+				document.querySelector('.sidebar-wrapper')?.classList.toggle('active');
 			});
 
-			function changeParentFolder(filepath, origin_folder, dest_folder) {
-				const opt = optimizePath(origin_folder);
-				if (opt === '/') {
-					return optimizePath(optimizePath(dest_folder) + '/' + optimizePath(filepath));
-				}
-				return optimizePath(optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder)));
-			}
+			document.querySelector('.search-results')?.addEventListener('blur', (e) => {
+				// 设置延迟否则无法点击链接
+				setTimeout(() => {
+					/** @type {HTMLElement | null} */
+					const el = document.querySelector('.search-results');
+					if (el) el.style.display = 'none';
+				}, 200);
+			});
 
-			function optimizePath(filepath) {
-				return (
-					'/' +
-					filepath
-						.replace(/\\/g, '/')
-						.split('/')
-						.filter((s) => s !== '.')
-						.filter((s) => s.trim())
-						.join('/')
-				);
+			document.querySelector('#search-btn')?.addEventListener('click', () => {
+				/** @type {HTMLInputElement | null} */
+				const searchInput = document.querySelector('#search-input');
+				/** @type {HTMLInputElement | null} */
+				const results = document.querySelector('.search-results');
+				if (!!searchInput === false || !!results === false) {
+					return;
+				}
+				searchInput.value = searchInput.value.trim();
+
+				results.style.display = 'block';
+				results.innerHTML = '';
+				results.focus();
+
+				let has_searched = false;
+
+				for (const info of __ewiki_files_info__ || []) {
+					/** @type {string} */
+					const content = (new DOMParser().parseFromString(info.text || '', 'text/html').body.textContent || '')
+						.replace(/\n/g, '')
+						.replace(/ +/g, ' ');
+					/** @type {string} */
+					const keyword = searchInput.value;
+					const index = content.indexOf(keyword);
+					if (index !== -1) {
+						has_searched = true;
+						const part1 = content.slice(0, index);
+						const part2 = content.slice(index + keyword.length, content.length);
+						const div = document.createElement('div');
+						const span = document.createElement('span');
+						span.innerHTML = part1.slice(0, 20) + `<mark>${keyword}</mark>` + part2.slice(0, 20) + '...';
+						const a = document.createElement('a');
+
+						const base_url = String(__ewiki_config__.base_url?.trim() || '/');
+
+						a.href = changeParentFolder(info.dest, __ewiki_config__.output_folder, base_url);
+						a.innerText = info.markdown_context.metadata.sidebar || 'unknown';
+
+						div.appendChild(a);
+						div.appendChild(span);
+						results.appendChild(div);
+					}
+				}
+
+				if (has_searched === false) {
+					results.innerHTML = '没有找到相关文章';
+				}
+			});
+
+
+
+
+			// 最后，优化全部路径  
+			document.querySelectorAll('.markdown-body a')?.forEach(el => {
+				let href = el.getAttribute('href')
+				if (href && href.startsWith('.')) {
+					if (href.endsWith('.md')) {
+						el.setAttribute('href', href.replace('.md', '.html'))
+					}
+				}
+			})
+		});
+
+		function changeParentFolder(filepath, origin_folder, dest_folder) {
+			const opt = optimizePath(origin_folder);
+			if (opt === '/') {
+				return optimizePath(optimizePath(dest_folder) + '/' + optimizePath(filepath));
 			}
-		</script>
-	</body>
+			return optimizePath(optimizePath(filepath).replace(optimizePath(origin_folder), optimizePath(dest_folder)));
+		}
+
+		function optimizePath(filepath) {
+			return (
+				'/' +
+				filepath
+					.replace(/\\/g, '/')
+					.split('/')
+					.filter((s) => s !== '.')
+					.filter((s) => s.trim())
+					.join('/')
+			);
+		}
+	</script>
+</body>
+
 </html>

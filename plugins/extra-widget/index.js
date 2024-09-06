@@ -48,9 +48,9 @@ exports.default = {
 }
 
 function buildFile(
-    /** @type {import('../../lib/index.d.ts').FileInfo[]} */
+    /** @type {import('../../lib/src/interface.d.ts').FileInfo[]} */
     sources,
-    /** @type {import('../../lib/index.d.ts').FileInfo} */
+    /** @type {import('../../lib/src/interface.d.ts').FileInfo} */
     file_info,
     raw_infos
 ) {
@@ -183,7 +183,7 @@ function buildFile(
         }
 
         // 为各个父级目录进行重命名
-        const folder_names = EWiki.config?.extra_widget_plugin.folder_names || {}
+        const folder_names = EWiki.config?.extra_widget_plugin?.folder_names || {}
         for (const key in folder_names) {
             if (Object.hasOwnProperty.call(folder_names, key)) {
                 const name = folder_names[key];

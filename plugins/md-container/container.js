@@ -14,7 +14,7 @@ const el = (document, tag, html) => {
 
 
 
-/** @type {import('../../lib/interface.d.ts').Plugin} */
+/** @type {import('../../lib/src/interface.d.ts').Plugin} */
 exports.default = {
     onMarkdownItInit(md) {
         // 添加自定义样式
