@@ -1,6 +1,6 @@
 {
 	"name": "ewiki",
-	"version": "0.0.58",
+	"version": "0.0.59",
 	"description": "easy-wiki",
 	"main": "./lib/src/cmd.js",
 	"types": "./lib/src/interface.d.ts",
