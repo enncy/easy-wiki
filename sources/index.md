@@ -1,15 +1,17 @@
 ---ewiki-config---
 create_at=2024/7/12 18:54:27
-update_at=2024/7/16 22:20:20
+update_at=2024/9/6 15:52:57
 sidebar=首页
 ---ewiki-config---
+
+
 
 
 
 # easy-wiki docs
 
 > 极致简单的 wiki 搭建工具，本教程也是使用 easy-wiki 构建的文档网站
-> 快速构建使用请查看 [快速构建教程，一秒部署上线](https://enncy.github.io/easy-wiki//dist/1_%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BA.html)
+> 快速构建使用请查看 [快速构建教程，一秒部署上线](./文档列表/1_快速构建.md)
 
 ::: info
 项目地址：[https://github.com/enncy/easy-wiki](https://github.com/enncy/easy-wiki)
