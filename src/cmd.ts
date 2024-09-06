@@ -51,7 +51,7 @@ program.option('--config <path>', 'config file path', './ewiki.config.json').act
 	if (fs.existsSync(args.config) == false) {
 		init(args.config);
 	}
-	EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
+	EWiki.config = parse(fs.readFileSync(args.config).toString()) as any;
 	loadPlugins(EWiki.config!).then(() => {
 		buildAll(EWiki.config!);
 	});
@@ -64,7 +64,7 @@ program
 		if (fs.existsSync(args.config) == false) {
 			init(args.config);
 		}
-		EWiki.config = JSON.parse(fs.readFileSync(args.config).toString());
+		EWiki.config = parse(fs.readFileSync(args.config).toString()) as any;
 		loadPlugins(EWiki.config!).then(async () => {
 			await buildAll(EWiki.config!);
 			watch(EWiki.config!);
