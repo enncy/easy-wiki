@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ewiki": "^0.0.57",
+    "markdown-it-container": "^4.0.0"
+  }
+}

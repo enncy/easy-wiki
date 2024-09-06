@@ -1,0 +1,54 @@
+{
+    "plugins": [
+        "./plugins/**/*.js",
+        "./node_modules/ewiki/plugins/**/*.js"
+    ],
+    "output_folder": "./dist",
+    "sources_folder": "./sources",
+    "ignore_sources": [
+        "./**/*.ignore.md",
+        "./**/*.ignore.png",
+        "./**/*.ignore.video",
+        "./node_modules/**/*.md"
+    ],
+    "ignore_plugins": [
+        "./**/*.ignore.js"
+    ],
+    "html_template": "./node_modules/ewiki/plugins/extra-widget/template.html",
+    "styles": [
+        "./style.css"
+    ],
+    "markdown_mount": ".markdown-body",
+    "server": {
+        "port": 3019,
+        "base_url": "/"
+    },
+    "markdown_it_config": {
+        "html": true,
+        "xhtmlOut": false,
+        "breaks": true,
+        "langPrefix": "language-",
+        "linkify": false,
+        "typographer": true,
+        "quotes": "“”‘’"
+    },
+    "extra_widget_plugin": {
+        "header_links": [
+            {
+                "text": "Github",
+                "href": "https://github.com/enncy/easy-wiki"
+            }
+        ],
+        "sidebar_links_group": [
+            {
+                "name": "外链",
+                "links": [
+                    {
+                        "text": "Github",
+                        "href": "https://github.com/enncy/easy-wiki"
+                    }
+                ]
+            }
+        ]
+    }
+}
