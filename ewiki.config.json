@@ -2,8 +2,8 @@
     "html_template": "./node_modules/ewiki/plugins/extra-widget/template.html",
     "sources_folder": "./sources",
     // if you want to output to the root directory, you can set it to "./"
-    // "output_folder": "./",
-    "output_folder": "./dist",
+    "output_folder": "./",
+    // "output_folder": "./dist",
     "plugins": [
         "./plugins/**/*.js",
         "./node_modules/ewiki/plugins/**/*.js"
