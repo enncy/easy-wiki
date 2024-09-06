@@ -78,8 +78,6 @@ async function loadPlugins(config: Config) {
 		ignore: config.ignore_plugins
 	});
 
-	console.log(config.plugins, files);
-
 	for (const file of files) {
 		try {
 			const plu = require(resolve(file)).default;
