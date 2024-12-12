@@ -158,7 +158,6 @@ html {
 .sidebar details {
 	border-radius: 4px;
 	margin: 8px 0px;
-	display: flex;
 	gap: 4px;
 }
 
