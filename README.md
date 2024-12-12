@@ -20,7 +20,9 @@ npm i ewiki -g
 git clone -b template git@github.com:enncy/easy-wiki.git my-wiki
 # 3.进入项目文件夹
 cd my-wiki
-# 4.编译项目
+# 4.安装依赖
+npm install
+# 5.编译项目
 npx ewiki
 ```
 
